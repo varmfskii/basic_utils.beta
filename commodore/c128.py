@@ -1,4 +1,4 @@
-from beta.commodore import base
+from commodore import base
 
 keywords = base.keywords + [
     ("rgr", 0xCC),

@@ -1,6 +1,6 @@
 import sys
 
-from beta.gwbasic import basica, ega, pcjr, sperry
+from gwbasic import basica, ega, pcjr, sperry
 
 from msbasic.options import Options as BaseOptions
 

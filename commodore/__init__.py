@@ -1,7 +1,7 @@
 import sys
 
-from beta.commodore import atbasic, simons, speech, superbasic, turtle
-from beta.commodore import base, basic4, basic10, basic35, c64_4, c128
+from commodore import atbasic, simons, speech, superbasic, turtle
+from commodore import base, basic4, basic10, basic35, c64_4, c128
 
 from msbasic.options import Options as BaseOptions
 
