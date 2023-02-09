@@ -6,9 +6,13 @@ from msbasic.pack import pack
 
 
 def main():
-    usage = ["\t-m\t--maxline=<num>\t\tmaximum tokenized line length\n"]
-    lopts = ["maxline="]
-    opts = Options(sys.argv[1:], sopts='m:', lopts=lopts, usage=usage, ext='pack', astokens=True)
+    usage = [
+        "\t-m\t--maxline=<num>\t\tmaximum tokenized line length\n",
+        "\t-u\t--text\t\t\toutput as text file\n"
+    ]
+    lopts = ["maxline=", "text"]
+    astokens = True
+    opts = Options(sys.argv[1:], sopts='m:t', lopts=lopts, usage=usage, ext='pack', astokens=True)
     maxline = 0
     for o, a in opts.unused:
         if o in ["-m", "--maxline"]:
@@ -16,14 +20,16 @@ def main():
             if maxline < 0:
                 sys.stderr.write(f'length must be non-negative\n')
                 sys.exit(2)
+        elif o in ['-u', '--textfile']:
+            astokens = False
         else:
             assert False, f'unhandled option: [{o}]'
     pp = Parser(opts, open(opts.iname, 'rb').read())
-    pack(pp, maxline)
-    if opts.astokens:
-        open(opts.oname, 'wb').write(tokenize(pp))
+    data = pack(pp, maxline)
+    if astokens:
+        open(opts.oname, 'wb').write(tokenize(data, opts))
     else:
-        open(opts.oname, 'w').write(pp.deparse())
+        open(opts.oname, 'w').write(pp.deparse(data))
 
 
 if __name__ == "__main__":

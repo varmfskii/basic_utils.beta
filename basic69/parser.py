@@ -8,7 +8,7 @@ class Parser(MSParser):
 
     def parse(self, data: list[int]) -> list[list[tuple]]:
         if data[0] < 0x80 and data[1] < 0x80:
-            self.parse_txt("".join(map(chr, data)))
+            self.full_parse = self.parse_txt("".join(map(chr, data)))
         elif data[0] == 0xff:
             self.full_parse = self.parse_bin(data[3:])
         elif data[0] == 0x55:

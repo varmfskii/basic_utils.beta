@@ -1,27 +1,7 @@
 #!/usr/bin/env python3
 import re
-from enum import Enum
 
-
-class Token(Enum):
-    NONE = 256
-    LABEL = 257
-    TOKEN = 258
-    ID = 259
-    STR = 260
-    ARR = 261
-    STRARR = 262
-    QUOTED = 263
-    REM = 264
-    DATA = 265
-    NUM = 266
-    HEX = 267
-    FLOAT = 268
-    WS = 269
-    KW = 270
-
-    def __repr__(self):
-        return self.name
+from msbasic.tokens import Token
 
 
 class Parser:
@@ -34,9 +14,9 @@ class Parser:
     kw2code = {}
     full_parse = None
 
-    def __init__(self, keywords, data=None, be=True):
+    def __init__(self, opts, data=None, be=True):
         self.be = be
-        for (w, c) in keywords:
+        for (w, c) in opts.keywords:
             self.code2kw[c] = w
             self.kw2code[w] = c
         if data:
@@ -132,13 +112,13 @@ class Parser:
                 tokens.append(token)
 
         nows = self.no_ws(tokens)
-        label = False
+        label = 0
         for ix, token in enumerate(nows):
             if label:
-                if token[0] in [Token.ID, Token.NUM]:
+                if token[0] == Token.NUM or (label == 2 and token[0] in [Token.ID, Token.NUM]):
                     nows[ix] = (Token.LABEL, token[1])
                 elif (token[0] == Token.KW and token[1] not in self.ign_kw) or token[0] == ord(':'):
-                    label = False
+                    label = 0
                 else:
                     pass
             else:
@@ -151,8 +131,10 @@ class Parser:
                         nows[ix] = (Token.ARR, token[1])
                     else:
                         pass
+                elif token[0] == Token.KW and token[1].upper() == 'GO':
+                    label = 2
                 elif token[0] == Token.KW and token[1].upper() in self.branch_kw:
-                    label = True
+                    label = 1
                 else:
                     pass
 
@@ -281,18 +263,24 @@ class Parser:
                 return Token.KW, line[:kl], self.kw2code[kw]
         return None
 
-    def deparse(self, ws=False) -> str:
+    def deparse(self, data=None, ws=False) -> str:
         out = ''
-        for line in self.full_parse:
+        if not data:
+            data = self.full_parse
+        for line in data:
             if line[0][0] == Token.LABEL:
                 out += line[0][1] + ' '
                 line = line[1:]
             for ix, token in enumerate(line):
-                if ix > 0 and line[ix - 1] and token[0] == Token.KW:
+                if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
+                        and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
+                    out += ' '
+                if ws and out[-1].isalnum() and token[1][0].isalnum():
                     out += ' '
                 if token[0] in [Token.QUOTED, Token.DATA, Token.REM]:
                     out += token[1]
                 else:
                     out += token[1].upper()
             out += '\n'
+
         return out
