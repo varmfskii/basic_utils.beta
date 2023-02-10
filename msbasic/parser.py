@@ -114,29 +114,25 @@ class Parser:
         nows = self.no_ws(tokens)
         label = 0
         for ix, token in enumerate(nows):
-            if label:
-                if token[0] == Token.NUM or (label == 2 and token[0] in [Token.ID, Token.NUM]):
-                    nows[ix] = (Token.LABEL, token[1])
-                elif (token[0] == Token.KW and token[1] not in self.ign_kw) or token[0] == ord(':'):
-                    label = 0
+            if label and (token[0] == Token.NUM or (label == 2 and token[0] in [Token.ID, Token.NUM])):
+                nows[ix] = (Token.LABEL, token[1])
+            elif label and ((token[0] == Token.KW and token[1].upper() not in self.ign_kw) or token[0] == ord(':')):
+                label = 0
+            if token[0] == Token.ID:
+                if ix + 2 < len(nows) and nows[ix + 1][0] == ord('$') and nows[ix + 2][0] == ord('('):
+                    nows[ix] = (Token.STRARR, token[1])
+                elif ix + 1 < len(nows) and nows[ix + 1][0] == ord('$'):
+                    nows[ix] = (Token.STR, token[1])
+                elif ix + 1 < len(nows) and nows[ix + 1][0] == ord('('):
+                    nows[ix] = (Token.ARR, token[1])
                 else:
                     pass
+            elif token[0] == Token.KW and token[1].upper() == 'GO':
+                label = 2
+            elif token[0] == Token.KW and token[1].upper() in self.branch_kw:
+                label = 1
             else:
-                if token[0] == Token.ID:
-                    if ix + 2 < len(nows) and nows[ix + 1][0] == ord('$') and nows[ix + 2][0] == ord('('):
-                        nows[ix] = (Token.STRARR, token[1])
-                    elif ix + 1 < len(nows) and nows[ix + 1][0] == ord('$'):
-                        nows[ix] = (Token.STR, token[1])
-                    elif ix + 1 < len(nows) and nows[ix + 1][0] == ord('('):
-                        nows[ix] = (Token.ARR, token[1])
-                    else:
-                        pass
-                elif token[0] == Token.KW and token[1].upper() == 'GO':
-                    label = 2
-                elif token[0] == Token.KW and token[1].upper() in self.branch_kw:
-                    label = 1
-                else:
-                    pass
+                pass
 
         i = 0
         j = 0
@@ -202,12 +198,12 @@ class Parser:
             if linein == "":
                 continue
             match1 = re.match(' *[0-9]+ *', linein)
-            match2 = re.match(' *[A-Za-z][0-9A-Za-z]*: *', linein)
+            match2 = re.match(' *([A-Za-z][0-9A-Za-z]*): *', linein)
             if match1:
                 line = [(Token.LABEL, str(int(linein[:match1.end()])))]
                 linein = linein[match1.end():]
             elif match2:
-                line = [(Token.LABEL, str(int(linein[:match2.end() - 1])))]
+                line = [(Token.LABEL, match2.group(1))]
                 linein = linein[match2.end():]
             else:
                 line = []
@@ -219,7 +215,7 @@ class Parser:
                         line.append((Token.REM, linein))
                         linein = ''
                         continue
-                    if line[-1][0] == self.kw2code['DATA']:
+                    if line[-1][0] == Token.KW and line[-1][1].upper() == 'DATA':
                         match = re.match('[^:]+', linein)
                         if match:
                             ml = match.end()
@@ -271,6 +267,8 @@ class Parser:
             if line[0][0] == Token.LABEL:
                 out += line[0][1] + ' '
                 line = line[1:]
+            else:
+                out += ' '
             for ix, token in enumerate(line):
                 if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
                         and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):

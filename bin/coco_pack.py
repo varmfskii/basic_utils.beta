@@ -8,7 +8,7 @@ from msbasic.pack import pack
 def main():
     usage = [
         "\t-m\t--maxline=<num>\t\tmaximum tokenized line length\n",
-        "\t-u\t--text\t\t\toutput as text file\n"
+        "\t-t\t--text\t\t\toutput as text file\n"
     ]
     lopts = ["maxline=", "text"]
     astokens = True
@@ -20,7 +20,7 @@ def main():
             if maxline < 0:
                 sys.stderr.write(f'length must be non-negative\n')
                 sys.exit(2)
-        elif o in ['-u', '--textfile']:
+        elif o in ['-t', '--textfile']:
             astokens = False
         else:
             assert False, f'unhandled option: [{o}]'

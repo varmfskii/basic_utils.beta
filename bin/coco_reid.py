@@ -7,7 +7,7 @@ from msbasic.variables import reid
 
 def main():
     astokens = True
-    usage = ["\t-u\t--text\t\t\toutput as text file\n"]
+    usage = ["\t-t\t--text\t\t\toutput as text file\n"]
     lopts = ["text"]
     opts = Options(sys.argv[1:], sopts='t', lopts=lopts, usage=usage, ext='reid')
     for o, a in opts.unused:

@@ -9,7 +9,7 @@ def main():
     astokens = True
     usage = [
         '\t-s<n>\t--start=<num>\t\tstarting line number\n',
-        '\t-u\t--text\t\t\toutput as text file\n',
+        '\t-t\t--text\t\t\toutput as text file\n',
         '\t-v<n>\t--interval=<num>\tinterval between line numbers\n'
     ]
     lopts = ["start=", "interval=", 'text']

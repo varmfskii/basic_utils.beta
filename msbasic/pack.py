@@ -58,18 +58,18 @@ def mergelines(data, maxlen=0):
     return lines
 
 
-def splitlines(pp):
+def splitlines(data):
     lines = []
-    for line in pp.full_parse:
+    for line in data:
         start = 0
         for ix, field in enumerate(line):
-            if field[0] in [pp.kw2code["REM"], pp.kw2code["'"], pp.kw2code["IF"]]:
+            if field[1].upper() in ["REM", "'", "IF"]:
                 break
-            if field[0] == pp.SEP:
+            if field[0] == ord(':'):
                 lines.append(line[start:ix])
                 start = ix + 1
         lines.append(line[start:])
-    pp.full_parse = lines
+    return lines
 
 
 def linelen(line):

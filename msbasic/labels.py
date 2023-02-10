@@ -11,7 +11,7 @@ def getlabs(data):
 
     for line in data:
         if line[0][0] == Token.LABEL:
-            labels.append(line[0][1])
+            labels.append(line[0][1].upper())
 
     return labels
 
@@ -23,7 +23,7 @@ def gettgtlabs(data):
     for ix, line in enumerate(data):
         for token in line[1:]:
             if token[0] == Token.LABEL:
-                labels.append(token[1])
+                labels.append(token[1].upper())
 
     labels.sort()
     return labels
@@ -58,7 +58,7 @@ def renumber(data, start=10, interval=10):
 
     for ix, line in enumerate(data):
         if line[0][0] == Token.LABEL:
-            labels[line[0][1]] = f'{number}'
+            labels[line[0][1].upper()] = f'{number}'
             data[ix][0] = (Token.LABEL, f'{number}')
         elif line[0][0] == Token.WS:
             data[ix][0] = [(Token.LABEL, f'{number}')]
@@ -86,7 +86,7 @@ def clean_labs(data):
     for line in data:
         if not line:
             continue
-        if line[0][0] != Token.LABEL or (line[0][0] == Token.LABEL and line[0][1] in labels):
+        if line[0][0] != Token.LABEL or (line[0][0] == Token.LABEL and line[0][1].upper() in labels):
             lines.append(line)
         elif len(line) > 1:
             lines.append(line[1:])
