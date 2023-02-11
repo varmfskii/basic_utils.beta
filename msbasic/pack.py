@@ -88,13 +88,14 @@ def split_lines(data):
     return lines
 
 
-def get_len(pp, line, text_len=False):
+def get_len(pp, in_line, text_len=False):
+    line = in_line
     if len(line) == 0:
         return 0
     if line[0][0] == Token.LABEL:
         line = line[1:]
     if text_len:
-        return len(pp.deparse(line))
+        return len(pp.deparse_line(line))
     len_acc = 0
     for token in line:
         if token[0] != Token.KW:

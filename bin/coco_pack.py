@@ -12,22 +12,22 @@ def main():
         "\t-t\t--text\t\t\toutput as text file\n",
         "\t-x\t--text-len\t\tline length is for untokenized form\n"
     ]
-    lopts = ["maxline=", "text"]
+    lopts = ['token-len', 'maxline=', 'text', 'text-len']
     astokens = True
     text_len = False
-    opts = Options(sys.argv[1:], sopts='m:t', lopts=lopts, usage=usage, ext='pack', astokens=True)
+    opts = Options(sys.argv[1:], sopts='km:tx', lopts=lopts, usage=usage, ext='pack', astokens=True)
     max_len = 0
     for o, a in opts.unused:
-        if o in ["-k", "--token-len"]:
+        if o in ['-k', '--token-len']:
             text_len = False
-        elif o in ["-m", "--maxline"]:
+        elif o in ['-m', '--maxline']:
             max_len = int(a)
             if max_len < 0:
                 sys.stderr.write(f'length must be non-negative\n')
                 sys.exit(2)
         elif o in ['-t', '--textfile']:
             astokens = False
-        elif o in ["-x", "--text-len"]:
+        elif o in ['-x', '--text-len']:
             text_len = True
         else:
             assert False, f'unhandled option: [{o}]'
