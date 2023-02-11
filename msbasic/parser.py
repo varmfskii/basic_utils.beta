@@ -25,7 +25,6 @@ class Parser:
         if data:
             self.parse(data)
 
-
     def parse(self, data: list[int]) -> list[list[tuple]]:
         if data[0] < 128 and data[1] < 128:
             self.full_parse = self.parse_txt("".join(map(chr, data)))
@@ -198,6 +197,7 @@ class Parser:
 
     def parse_txt(self, data: str) -> list[list[tuple]]:
         parsed = []
+        data = re.sub('\\\\(\n|\r|\r\n|\n\r)', data, '')
         for linein in re.split('[\n\r]+', data):
             if linein == "":
                 continue
