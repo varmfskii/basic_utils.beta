@@ -1,3 +1,6 @@
+# http://www.zimmers.net/anonftp/pub/cbm/programming/cbm-basic-tokens.txt
+from commodore import c2_0
+
 keywords = c2_0.keywords + [
     ("concat", 0xcc),
     ("dopen", 0xcd),

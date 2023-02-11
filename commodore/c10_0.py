@@ -1,3 +1,6 @@
+# http://www.zimmers.net/anonftp/pub/cbm/programming/cbm-basic-tokens.txt
+from commodore import c2_0
+
 keywords = c2_0.keywords + [
     ("rgr", 0xcc),
     ("rclr", 0xcd),

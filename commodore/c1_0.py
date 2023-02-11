@@ -1,3 +1,4 @@
+# http://www.zimmers.net/anonftp/pub/cbm/programming/cbm-basic-tokens.txt
 keywords = [
     ("end", 0x80),
     ("for", 0x81),

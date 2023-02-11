@@ -1,3 +1,4 @@
+# http://www.zimmers.net/anonftp/pub/cbm/programming/cbm-basic-tokens.txt
 keywords = c2_0.keywords + [
     ("key", 0xcc),
     ("graphic", 0xcd),
