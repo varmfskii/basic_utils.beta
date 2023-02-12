@@ -1,57 +1,74 @@
 import sys
 
-from commodore import atbasic, c1_0, c2_0, c2_0super, c4_0, c4_0x, c7_0, c10_0
-from commodore import simons, superbasic, turtle 
-
+from commodore import c1_0, c2_0, c3_5, c4_0, c4_0x, c7_0, c10_0
+from commodore import atbasic, simons, speech, superbasic, turtle 
 from msbasic.options import Options as BaseOptions
-
+from msbasic.tokens import tokenize_line
+from .parser import Parser
 
 class Options(BaseOptions):
+    DIALECTS = {
+        '1.0': (c1_0.keywords, c1_0.remarks, 0x0401),
+        '2.0': (c2_0.keywords, c1_0.remarks, 0x0801),
+        '3.5': (c3_5.keywords, c1_0.remarks, 0x1001),
+        '4.0': (c4_0.keywords, c1_0.remarks, 0x0401),
+        '7.0': (c7_0.keywords, c1_0.remarks, 0x1c01),
+        '10.0': (c10_0.keywords, c1_0.remarks, 0x0801),
+        'pet': (c2_0.keywords, c1_0.remarks, 0x0401),
+        'pet1': (c1_0.keywords, c1_0.remarks, 0x0401),
+        'pet2': (c2_0.keywords, c1_0.remarks, 0x0401),
+        'pet4': (c4_0.keywords, c1_0.remarks, 0x0401),
+        'vic20': (c2_0.keywords, c1_0.remarks, 0x1001),
+        'c16': (c3_5.keywords, c1_0.remarks, 0x1001),
+        'c64': (c2_0.keywords, c1_0.remarks, 0x0801),
+        'c128': (c7_0.keywords, c1_0.remarks, 0x1c01),
+        'c64_4.0': (c4_0x.keywords, c1_0.remarks, 0x0801),
+        'super': (superbasic.keywords, c1_0.remarks, 0x0801),
+        'simons': (simons.keywords, c1_0.remarks, 0x0801),
+        'speech': (speech.keywords, c1_0.remarks, 0x0801),
+        'atbasic': (atbasic.keywords, c1_0.remarks, 0x0801),
+        'turtle': (turtle.keywords, c1_0.remarks, 0x1001),
+    }
     sopts = 'b:' + BaseOptions.sopts
     lopts = ['basic='] + BaseOptions.lopts
-    usage = ['\t-b<d>\t--basic=<dialect>\tbasic dialect\n'] + BaseOptions.usage
+    usage = BaseOptions.usage + [
+        '\t-b\t--basic=<dialect>\tbasic dialect\n'
+    ]
     keywords = c2_0.keywords
     remarks = c1_0.remarks
-    dialects = {
-        "1.0": (c1_0.keywords, c1_0.remarks),
-        "2.0": (c2_0.keywords, c1_0.remarks),
-        "3.5": (c3_5.keywords, c1_0.remarks),
-        "4.0": (c4_0.keywords, c1_0.remarks),
-        "7.0": (c7_0.keywords, c1_0.remarks),
-        "10.0": (c10_0.keywords, c1_0.remarks),
-        "pet": (c2_0.keywords, c1_0.remarks),
-        "pet1": (c1_0.keywords, c1_0.remarks),
-        "pet2": (c2_0.keywords, c1_0.remarks),
-        "pet4": (c4_0.keywords, c1_0.remarks),
-        "vic20": (c2_0.keywords, c1_0.remarks),
-        "c16": (c3_5.keywords, c1_0.remarks),
-        "c64": (c2_0.keywords, c1_0.remarks),
-        "c128": (c7_0.keywords, c1_0.remarks),
-        "c64_4.0": (c4_0x.keywords, c1_0.remarks),
-        "super": (superbasic.keywords, c1_0.remarks),
-        "simons": (simons.keywords, c1_0.remarks),
-        "speech": (speech.keywords, c1_0.remarks),
-        "atbasic": (atbasic.keywords, c1_0.remarks),
-        "turtle": (turtle.keywords, c1_0.remarks),
-    }
 
     def subopts(self, other):
-        o, a = other
-        if o in ["-b", "--basic"]:
-            if a in self.dialects.keys():
-                self.keywords, self.remarks = dialects[a]
-            elif a == "help":
-                print("Supported dialects:")
-                for key in self.dialects.keys():
+        (o, a) = other
+        if o in ['-b', '--basic']:
+            if a in self.DIALECTS.keys():
+                self.keywords, self.remarks, address = self.DIALECTS[a]
+                if self.address == 0:
+                    self.address = address
+            elif a == 'help':
+                print('Supported dialects:')
+                for key in self.DIALECTS.keys():
                     print(f'\t{key}')
                 sys.exit(0)
             else:
                 sys.stderr.write(f'Unsupported dialect: {a}\n')
-                sys.stderr.write("--basic=help to list available dialects")
+                sys.stderr.write("--basic=help to list available dialects\n")
                 sys.exit(2)
         else:
-            self.unused.append((o, a))
+            self.unused.append(other)
 
+    def post(self):
+        if self.address == 0x0000:
+            self.address = 0x0801
 
-if __name__ == "__main__":
-    sys.stderr.write("This is a library")
+def tokenize(data, opts):
+    # convert a parsed file into tokenized BASIC file
+    address = opts.address
+    tokenized = [address & 0xff, address // 0x100]
+    for line in data:
+        line_tokens = tokenize_line(line, be=False)
+        address += 2 + len(line_tokens)
+        tokenized += [address & 0xff, address // 0x0100] + line_tokens
+    return bytearray(tokenized)
+
+if __name__ == '__main__':
+    sys.stderr.write("This is a library\n")

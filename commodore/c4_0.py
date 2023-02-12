@@ -2,19 +2,19 @@
 from commodore import c2_0
 
 keywords = c2_0.keywords + [
-    ("concat", 0xcc),
-    ("dopen", 0xcd),
-    ("dclose", 0xce),
-    ("record", 0xcf),
-    ("header", 0xd0),
-    ("collect", 0xd1),
-    ("backup", 0xd2),
-    ("copy", 0xd3),
-    ("append", 0xd4),
-    ("dsave", 0xd5),
-    ("dload", 0xd6),
-    ("catalog", 0xd7),
-    ("rename", 0xd8),
-    ("scratch", 0xd9),
-    ("directory", 0xda)
+    ("CONCAT", 0xCC),
+    ("DOPEN", 0xCD),
+    ("DCLOSE", 0xCE),
+    ("RECORD", 0xCF),
+    ("HEADER", 0xD0),
+    ("COLLECT", 0xD1),
+    ("BACKUP", 0xD2),
+    ("COPY", 0xD3),
+    ("APPEND", 0xD4),
+    ("DSAVE", 0xD5),
+    ("DLOAD", 0xD6),
+    ("CATALOG", 0xD7),
+    ("RENAME", 0xD8),
+    ("SCRATCH", 0xD9),
+    ("DIRECTORY", 0xDA)
 ]
