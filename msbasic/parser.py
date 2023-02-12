@@ -14,8 +14,10 @@ class Parser:
     kw2code = {}
     kw_keys = []
     full_parse = None
-
+    opts = None
+    
     def __init__(self, opts, data=None, be=True):
+        self.opts = opts
         self.be = be
         for (w, c) in opts.keywords:
             self.code2kw[c] = w

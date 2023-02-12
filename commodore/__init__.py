@@ -30,14 +30,18 @@ class Options(BaseOptions):
         'atbasic': (atbasic.keywords, c1_0.remarks, 0x0801),
         'turtle': (turtle.keywords, c1_0.remarks, 0x1001),
     }
-    sopts = 'b:' + BaseOptions.sopts
-    lopts = ['basic='] + BaseOptions.lopts
+    sopts = 'b:pm' + BaseOptions.sopts
+    lopts = ['basic=', 'petscii', 'mixed-case'] + BaseOptions.lopts
     usage = BaseOptions.usage + [
-        '\t-b\t--basic=<dialect>\tbasic dialect\n'
+        '\t-b\t--basic=<dialect>\tbasic dialect\n',
+        '\t-p\t--petscii\tuse petscii\n',
+        '\t-m\t--mixed-case\tpetscii is mixed case\n'
     ]
     keywords = c2_0.keywords
     remarks = c1_0.remarks
-
+    petscii = False
+    mixed = False
+    
     def subopts(self, other):
         (o, a) = other
         if o in ['-b', '--basic']:
@@ -54,6 +58,10 @@ class Options(BaseOptions):
                 sys.stderr.write(f'Unsupported dialect: {a}\n')
                 sys.stderr.write("--basic=help to list available dialects\n")
                 sys.exit(2)
+        elif o in ['-p', '--petscii']:
+            petscii = True
+        elif o in ['-m', '--mixed-case']:
+            mixed = True
         else:
             self.unused.append(other)
 
