@@ -29,15 +29,16 @@ class Options(BaseOptions):
     ]
 
     keywords = c2_0.keywords
-    remarks = c1_0.remarks
+    remarks = c1_0.remark
+    address = 0x0000
 
     def subopts(self, other):
         (o, a) = other
         if o in ["-b", "--basic"]:
             if a in self.DIALECTS.keys():
-                self.keywords, self.remarks, address = self.DIALECTS[a]
+                self.keywords, self.remarks, addy = self.DIALECTS[a]
                 if self.address == 0:
-                    self.address = address
+                    self.address = addy
             elif a == "help":
                 print("Supported self.DIALECTS:")
                 for key in self.DIALECTS.keys():
@@ -51,7 +52,8 @@ class Options(BaseOptions):
             self.unused.append(other)
 
         if self.address == 0x0000:
-            self.address == 0x0801
+            self.address = 0x0801
+
 
 def tokenize(data, opts):
     # convert a parsed file into tokenized BASIC file

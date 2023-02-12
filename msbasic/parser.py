@@ -279,7 +279,7 @@ class Parser:
             out = ' '
         for ix, token in enumerate(line):
             if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
-                and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
+                    and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
                 out += ' '
             if ws and out[-1].isalnum() and token[1][0].isalnum():
                 out += ' '
@@ -288,4 +288,4 @@ class Parser:
             else:
                 out += token[1].upper()
         out += '\n'
-        return out;
+        return out

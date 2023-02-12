@@ -13,7 +13,6 @@ class Parser(MSParser):
             self.full_parse = self.parse_bin(data)
         return self.full_parse
 
-
     def deparse_line(self, line, ws=False):
         if line[0][0] == Token.LABEL:
             out = line[0][1] + ' '
@@ -22,7 +21,7 @@ class Parser(MSParser):
             out = ' '
         for ix, token in enumerate(line):
             if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
-                and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
+                    and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
                 out += ' '
             if ws and out[-1].isalnum() and token[1][0].isalnum():
                 out += ' '
@@ -31,8 +30,8 @@ class Parser(MSParser):
             else:
                 out += token[1].lower()
         out += '\n'
-        return out;
-    
+        return out
+
 
 if __name__ == "__main__":
     sys.stderr.write("This is a library")

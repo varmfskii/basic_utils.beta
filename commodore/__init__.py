@@ -1,10 +1,11 @@
 import sys
 
 from commodore import c1_0, c2_0, c3_5, c4_0, c4_0x, c7_0, c10_0
-from commodore import atbasic, simons, speech, superbasic, turtle 
+from commodore import atbasic, simons, speech, superbasic, turtle
 from msbasic.options import Options as BaseOptions
 from msbasic.tokens import tokenize_line
 from .parser import Parser
+
 
 class Options(BaseOptions):
     DIALECTS = {
@@ -60,6 +61,7 @@ class Options(BaseOptions):
         if self.address == 0x0000:
             self.address = 0x0801
 
+
 def tokenize(data, opts):
     # convert a parsed file into tokenized BASIC file
     address = opts.address
@@ -69,6 +71,7 @@ def tokenize(data, opts):
         address += 2 + len(line_tokens)
         tokenized += [address & 0xff, address // 0x0100] + line_tokens
     return bytearray(tokenized)
+
 
 if __name__ == '__main__':
     sys.stderr.write("This is a library\n")
