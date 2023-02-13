@@ -2,7 +2,7 @@
 
 import sys
 
-from basic69 import Options, Parser, tokenize
+from commodore import Options, Parser, tokenize
 from msbasic.labels import renumber
 from msbasic.pack import pack, split_lines
 from msbasic.variables import reid
@@ -44,7 +44,7 @@ def packfn(args):
     lopts = ['token-len', 'maxline=', 'text', 'text-len']
     astokens = True
     text_len = False
-    opts = Options(args, sopts='km:tx', lopts=lopts, usage=usage, ext='pack', astokens=True)
+    opts = Options(args, sopts='km:tx', lopts=lopts, usage=usage, ext='pack')
     max_len = 0
     for o, a in opts.unused:
         if o in ['-k', '--token-len']:
@@ -166,11 +166,10 @@ def helpfn(program):
         "\nCommon Options:\n"
         "\t-a<a>\t--address=<addy>\tStarting memory address\n"
         "\t-b<d>\t--basic=<dialect\tBASIC dialect\n"
-        "\t-c\t--cassette\t\tCassette file format\n"
-        "\t-d\t--disk\t\t\tDisk file format\n"
         "\t-h\t--help\t\t\tHelp message\n"
         "\t-i<n>\t--input=<file>\t\tinput file\n"
         "\t-o<n>\t--output=<file>\t\toutput file\n"
+        "\t-p\t--petscii\t\t\tuse petscii\n"
     )
 
 

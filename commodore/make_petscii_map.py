@@ -1,4 +1,4 @@
-p2am_m = { 0x7e: 0x01fb96, 0x7f: 0x01fb98, 0xa9: 0x01fb99, 0xba: 0x2713 }
+p2am_m = {0x7e: 0x01fb96, 0x7f: 0x01fb98, 0xa9: 0x01fb99, 0xba: 0x2713}
 p2au_m = {
     0x7e: 0x03c0, 0x7f: 0x25e5, 0xa9: 0x25e4, 0xba: 0x01fb7f,
     0x61: 0x2660, 0x62: 0x01fb72, 0x63: 0x01fb78, 0x64: 0x01fb77,
@@ -22,44 +22,45 @@ p2a_m = {
     0xbf: 0x259a
 }
 
-def p2am(c):
-    if (0xc0<=c<=0xdf):
-        c = (c&0x1f)|0x60
-    elif (0xe0<=c<=0xff):
-        c = (c & 0x1f)|0xa0
-    if c<=0x40 or c in [0x5b, 0x5d, 0xa0]:
-        return c
-    elif 0x41<=c<=0x5a:
-        return c|0x20
-    elif 0x61<=c<=0x7a:
-        return c&0xdf
-    elif c in p2am_m.keys():
-        return p2am_m[c]
+
+def p2am(petscii):
+    if 0xc0 <= petscii <= 0xdf:
+        petscii = (petscii & 0x1f) | 0x60
+    elif 0xe0 <= petscii <= 0xff:
+        petscii = (petscii & 0x1f) | 0xa0
+    if petscii <= 0x40 or petscii in [0x5b, 0x5d, 0xa0]:
+        return petscii
+    elif 0x41 <= petscii <= 0x5a:
+        return petscii | 0x20
+    elif 0x61 <= petscii <= 0x7a:
+        return petscii & 0xdf
+    elif petscii in p2am_m.keys():
+        return p2am_m[petscii]
     else:
-        return p2a_m[c]
-    return out
+        return p2a_m[petscii]
 
 
-def p2au(c):
-    if (0xc0<=c<=0xdf):
-        c = (c&0x1f)|0x60
-    elif (0xe0<=c<=0xff):
-        c = (c & 0x1f)|0xa0
-    if c<=0x5b or c in [0x5d, 0xa0]:
-        return c
-    elif c in p2au_m.keys():
-        return p2au_m[c]
+def p2au(petscii):
+    if 0xc0 <= petscii <= 0xdf:
+        petscii = (petscii & 0x1f) | 0x60
+    elif 0xe0 <= petscii <= 0xff:
+        petscii = (petscii & 0x1f) | 0xa0
+    if petscii <= 0x5b or petscii in [0x5d, 0xa0]:
+        return petscii
+    elif petscii in p2au_m.keys():
+        return p2au_m[petscii]
     else:
-        return p2a_m[c]
+        return p2a_m[petscii]
+
 
 data = {}
 for a in range(0x20, 0x80):
     c = p2au(a)
-    if c!=a:
+    if c != a:
         data[a] = c
-for c in range(0xa0, 0x100):
+for a in range(0xa0, 0x100):
     c = p2au(a)
-    if c!=a:
+    if c != a:
         data[a] = c
 print(f'p2au = {data}')
 
@@ -73,11 +74,11 @@ print(f'a2pu = {data1}')
 data = {}
 for a in range(0x20, 0x80):
     c = p2am(a)
-    if c!=a:
+    if c != a:
         data[a] = c
-for c in range(0xa0, 0x100):
+for a in range(0xa0, 0x100):
     c = p2am(a)
-    if c!=a:
+    if c != a:
         data[a] = c
 print(f'p2am = {data}')
 
@@ -87,4 +88,3 @@ for a in data.keys():
     if c not in data1.keys():
         data1[c] = a
 print(f'a2pm = {data1}')
-

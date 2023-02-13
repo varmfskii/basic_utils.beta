@@ -34,7 +34,7 @@ class Options(BaseOptions):
     lopts = ['basic=', 'petscii', 'mixed-case'] + BaseOptions.lopts
     usage = BaseOptions.usage + [
         '\t-b\t--basic=<dialect>\tbasic dialect\n',
-        '\t-p\t--petscii\tuse petscii\n',
+        '\t-n\t--not-petscii\tdon\'t use petscii\n',
         '\t-m\t--mixed-case\tpetscii is mixed case\n'
     ]
     keywords = c2_0.keywords
@@ -58,10 +58,10 @@ class Options(BaseOptions):
                 sys.stderr.write(f'Unsupported dialect: {a}\n')
                 sys.stderr.write("--basic=help to list available dialects\n")
                 sys.exit(2)
-        elif o in ['-p', '--petscii']:
-            petscii = True
+        elif o in ['-n', '--not-petscii']:
+            self.petscii = True
         elif o in ['-m', '--mixed-case']:
-            mixed = True
+            self.mixed = True
         else:
             self.unused.append(other)
 

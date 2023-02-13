@@ -1,6 +1,5 @@
 from basic69.coco import cb, ecb, decb, secb, sdecb
-from basic69.dragon import basic as dragon
-from basic69.dragon import ddos
+from basic69.dragon import dragon, ddos
 from msbasic.options import Options as BaseOptions
 from msbasic.tokens import tokenize_line
 from .parser import Parser
