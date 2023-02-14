@@ -36,18 +36,26 @@ def detokenizefn(args):
 
 def packfn(args):
     usage = [
+        "\t-P\t--point\t\tconvert 0 to .\n",
+        "\t-X\t--hex\t\t\tconvert integers to &Hhex form\n",
         "\t-k\t--token-len\t\tline length is for tokenized form\n",
         "\t-m\t--maxline=<num>\t\tmaximum line length\n",
         "\t-t\t--text\t\t\toutput as text file\n",
         "\t-x\t--text-len\t\tline length is for untokenized form\n"
     ]
-    lopts = ['token-len', 'maxline=', 'text', 'text-len']
+    lopts = ['token-len', 'maxline=', 'text', 'text-len', 'point', 'hex']
     astokens = True
     text_len = False
-    opts = Options(args, sopts='km:tx', lopts=lopts, usage=usage, ext='pack')
+    z2p = False
+    i2x = False
+    opts = Options(args, sopts='PXkm:tx', lopts=lopts, usage=usage, ext='pack')
     max_len = 0
     for o, a in opts.unused:
-        if o in ['-k', '--token-len']:
+        if o in ['-P', '--point']:
+            z2p = True
+        elif o in ['-X', '--hex']:
+            i2x = True
+        elif o in ['-k', '--token-len']:
             text_len = False
         elif o in ['-m', '--maxline']:
             max_len = int(a)
@@ -61,7 +69,7 @@ def packfn(args):
         else:
             assert False, f'unhandled option: [{o}]'
     pp = Parser(opts, open(opts.iname, 'rb').read())
-    data = pack(pp, text_len=text_len, max_len=max_len)
+    data = pack(pp, text_len=text_len, max_len=max_len, i2x=i2x, z2p=z2p)
     if astokens:
         open(opts.oname, 'wb').write(tokenize(data, opts))
     else:
