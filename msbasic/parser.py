@@ -15,7 +15,7 @@ class Parser:
     kw_keys = []
     full_parse = None
     opts = None
-    
+
     def __init__(self, opts, data=None, be=True):
         self.opts = opts
         self.be = be
@@ -273,7 +273,8 @@ class Parser:
             out += self.deparse_line(line, ws)
         return out
 
-    def deparse_line(self, line, ws=False):
+    @staticmethod
+    def deparse_line(line, ws=False):
         if line[0][0] == Token.LABEL:
             out = line[0][1] + ' '
             line = line[1:]
