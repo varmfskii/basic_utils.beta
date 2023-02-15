@@ -5,7 +5,7 @@ working/beta directory
 A collection of python scripts for processing BASIC program files for
 vintage computers.
 
-## Global options: <command> <function> [<options>] [<infile>] [<outfile>]  
+## Global options: &lt;command&gt; &lt;function&gt; [&lt;options&gt;] [&lt;infile&gt;] [&lt;outfile&gt;]  
 
 -a/--address: set starting address for tokenized code
 
