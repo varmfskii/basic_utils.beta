@@ -26,6 +26,7 @@ def main(program, args):
 
 def detokenizefn(args):
     opts = Options(args, ext='txt')
+    print(opts.unused)
 
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'

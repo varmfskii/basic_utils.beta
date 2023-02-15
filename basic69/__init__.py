@@ -1,4 +1,5 @@
 from basic69.coco import cb, ecb, decb, secb, sdecb
+from basic69.coco import cb_fr, ecb_fr, decb_fr, secb_fr, sdecb_fr
 from basic69.dragon import dragon, ddos
 from msbasic.options import Options as BaseOptions
 from msbasic.tokens import tokenize_line
@@ -12,6 +13,11 @@ class Options(BaseOptions):
         "decb": (decb.keywords, decb.remarks, False),
         "secb": (secb.keywords, secb.remarks, False),
         "sdecb": (sdecb.keywords, sdecb.remarks, False),
+        "cbf": (cb_fr.keywords, cb.remarks, False),
+        "ecbf": (ecb_fr.keywords, ecb.remarks, False),
+        "decbf": (decb_fr.keywords, decb.remarks, False),
+        "secbf": (secb_fr.keywords, secb.remarks, False),
+        "sdecbf": (sdecb_fr.keywords, sdecb.remarks, False),
         "dragon": (dragon.keywords, dragon.remarks, True),
         "ddos": (ddos.keywords, ddos.remarks, True),
     }
@@ -42,7 +48,7 @@ class Options(BaseOptions):
                 sys.stderr.write(f'Unsupported dialect: {a}\n')
                 sys.stderr.write("--basic=help to list available dialects")
                 sys.exit(2)
-        if o in ["-c", "--cassette"]:
+        elif o in ["-c", "--cassette"]:
             self.disk = False
         elif o in ["-d", "--disk"]:
             self.disk = True
