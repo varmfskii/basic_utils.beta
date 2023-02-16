@@ -75,13 +75,6 @@ def merge_lines(pp, data=None, max_len=0, text_len=False):
     return lines
 
 
-def has_data(line: [tuple]) -> bool:
-    for token in line:
-        if token[0] == Token.KW and token[1].upper() == 'DATA':
-            return True
-    return False
-
-
 def split_lines(data):
     lines = []
     for line in data:
