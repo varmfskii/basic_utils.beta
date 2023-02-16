@@ -59,7 +59,7 @@ def merge_lines(pp, data=None, max_len=0, text_len=False):
                 nextline = line
                 old_len = 5 + next_len
         for token in line:
-            if token[0] == Token.KW and token[1].upper() == 'IF':
+            if token[0] == Token.KW and token[1].upper() in ['IF', 'DATA']:
                 lines.append(nextline)
                 line_no += 1
                 nextline = []
@@ -71,7 +71,15 @@ def merge_lines(pp, data=None, max_len=0, text_len=False):
 
     if nextline:
         lines.append(nextline)
+
     return lines
+
+
+def has_data(line: [tuple]) -> bool:
+    for token in line:
+        if token[0] == Token.KW and token[1].upper() == 'DATA':
+            return True
+    return False
 
 
 def split_lines(data):
