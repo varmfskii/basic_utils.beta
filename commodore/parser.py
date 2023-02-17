@@ -2,38 +2,22 @@
 import sys
 
 from msbasic.parser import Parser as MSParser
-from msbasic.parser import Token
 from .petscii import a2p, p2a
 
 
 class Parser(MSParser):
 
-    def parse(self, data: list[int]) -> list[list[tuple]]:
+    def parse(self, data: list[int], fix_data=False) -> list[list[tuple]]:
         if data[0] < 0x80 and data[1] < 0x80:
             if self.opts.petscii:
                 data = a2p(data, mixed=self.opts.mixed)
-            self.full_parse = self.parse_txt("".join(map(chr, data)))
+            self.full_parse = self.parse_txt("".join(map(chr, data)), fix_data=fix_data)
         else:
-            self.full_parse = self.parse_bin(data)
+            self.full_parse = self.parse_bin(data, fix_data=fix_data)
         return self.full_parse
 
     def deparse_line(self, line, ws=False):
-        if line[0][0] == Token.LABEL:
-            out = line[0][1] + ' '
-            line = line[1:]
-        else:
-            out = ' '
-        for ix, token in enumerate(line):
-            if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
-                    and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
-                out += ' '
-            if ws and out[-1].isalnum() and token[1][0].isalnum():
-                out += ' '
-            if token[0] in [Token.QUOTED, Token.DATA, Token.REM]:
-                out += token[1]
-            else:
-                out += token[1].upper()
-        out += '\n'
+        out = super().deparse_line(line, ws=ws)
         if self.opts.petscii:
             out = "".join(map(chr, p2a(list(map(ord, out)), self.opts.mixed)))
         return out

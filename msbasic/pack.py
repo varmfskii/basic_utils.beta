@@ -67,7 +67,7 @@ def merge_lines(pp, data=None, max_len=0, text_len=False):
                     line = line[:-2]
                     if len(line) > 0 and line[-1] == (ord(':'), ':'):
                         line = line[:-1]
-                if len(nextline) >0 and len(line) > 0:
+                if len(nextline) > 0 and len(line) > 0:
                     nextline += [(ord(':'), ':')]
                     old_len += 1
                 nextline += line
