@@ -11,6 +11,7 @@ from msbasic.variables import reid
 def main(program, args):
     functions = {
         'd': detokenizefn, 'detokenize': detokenizefn,
+        'f': fixfn, 'fix_data': fixfn,
         'h': helpfn, 'help': helpfn,
         'p': packfn, 'pack': packfn,
         'ri': reidfn, 'reid': reidfn,
@@ -26,12 +27,21 @@ def main(program, args):
 
 def detokenizefn(args):
     opts = Options(args, ext='txt')
-    print(opts.unused)
 
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
 
     pp = Parser(opts, open(opts.iname, 'rb').read())
+    open(opts.oname, 'w').write(pp.deparse())
+
+
+def fixfn(args):
+    opts = Options(args, ext='txt')
+
+    for o, a in opts.unused:
+        assert False, f'unhandled option [{o}]'
+
+    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=True)
     open(opts.oname, 'w').write(pp.deparse())
 
 
@@ -69,7 +79,7 @@ def packfn(args):
             text_len = True
         else:
             assert False, f'unhandled option: [{o}]'
-    pp = Parser(opts, open(opts.iname, 'rb').read())
+    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=True)
     data = pack(pp, text_len=text_len, max_len=max_len, i2x=i2x, z2p=z2p)
     if astokens:
         open(opts.oname, 'wb').write(tokenize(data, opts))

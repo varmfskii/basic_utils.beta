@@ -163,18 +163,19 @@ class Parser:
                     new_line = new_line[:-1]
             elif token[0] == Token.DATA:
                 new_data = token[1]
-                m = re.match(r'\W*', new_data)
+                m = re.match(r' *', new_data)
                 new_data = new_data[m.end():]
                 if new_data and data:
                     data += ',' + new_data
                 elif new_data:
                     data = new_data
-            else:
+            elif token != (ord(':'), ':') or len(new_line) != 1 or new_line[0][0] != Token.LABEL:
                 new_line.append(token)
         if data:
             if len(new_line) > 1 or len(new_line) == 1 and new_line[0][0] != Token.LABEL:
                 new_line.append((ord(':'), ':'))
-            new_line += [(Token.KW, self.data_kw[0]), (Token.DATA, ' ' + data)]
+            new_line += [(Token.KW, self.data_kw[0], self.kw2code[self.data_kw[0]]),
+                         (Token.DATA, ' ' + data)]
         return new_line
 
     @staticmethod
@@ -225,15 +226,7 @@ class Parser:
 
     def parse_txt(self, data: str, fix_data=False) -> list[list[tuple]]:
         parsed = []
-        data = data.split('\\')
-        s = data[0]
-        for p in data[1:]:
-            m = re.match('\r?\n?', p)
-            if m.end() == 0:
-                s += '\\' + p
-            else:
-                s += p[m.end():]
-        data = s
+        data = cont_line(data)
         for linein in re.split('[\n\r]+', data):
             if linein == "":
                 continue
@@ -304,25 +297,37 @@ class Parser:
         if not data:
             data = self.full_parse
         for line in data:
-            out += self.deparse_line(line, ws)
+            out += deparse_line(line, ws)
         return out
 
-    @staticmethod
-    def deparse_line(line, ws=False):
-        if line[0][0] == Token.LABEL:
-            out = line[0][1] + ' '
-            line = line[1:]
+
+def cont_line(data: str) -> str:
+    data = data.split('\\')
+    s = data[0]
+    for p in data[1:]:
+        m = re.match('\r?\n?', p)
+        if m.end() == 0:
+            s += '\\' + p
         else:
-            out = ' '
-        for ix, token in enumerate(line):
-            if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
-                    and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
-                out += ' '
-            if ws and out[-1].isalnum() and token[1][0].isalnum():
-                out += ' '
-            if token[0] in [Token.QUOTED, Token.DATA, Token.REM]:
-                out += token[1]
-            else:
-                out += token[1].upper()
-        out += '\n'
-        return out
+            s += p[m.end():]
+    return s
+
+
+def deparse_line(line, ws=False):
+    if line[0][0] == Token.LABEL:
+        out = line[0][1] + ' '
+        line = line[1:]
+    else:
+        out = ' '
+    for ix, token in enumerate(line):
+        if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
+                and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
+            out += ' '
+        if ws and out[-1].isalnum() and token[1][0].isalnum():
+            out += ' '
+        if token[0] in [Token.QUOTED, Token.DATA, Token.REM]:
+            out += token[1]
+        else:
+            out += token[1].upper()
+    out += '\n'
+    return out
