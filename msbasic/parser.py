@@ -269,10 +269,13 @@ class Parser:
                     linein = linein[ml:]
                     continue
 
-                match = re.match('"[^"]*"', linein)
+                match = re.match('"[^"]*"?', linein)
                 if match:
                     ml = match.end()
-                    line.append((Token.QUOTED, linein[:ml]))
+                    quoted = line[:ml]
+                    if quoted[-1] != '"':
+                        quoted += '"'
+                    line.append((Token.QUOTED, quoted))
                     linein = linein[ml:]
                     continue
 
