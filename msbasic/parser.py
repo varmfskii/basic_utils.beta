@@ -278,7 +278,7 @@ class Parser:
                 match = re.match('"[^"]*"?', linein)
                 if match:
                     ml = match.end()
-                    quoted = line[:ml]
+                    quoted = linein[:ml]
                     if quoted[-1] != '"':
                         quoted += '"'
                     line.append((Token.QUOTED, quoted))

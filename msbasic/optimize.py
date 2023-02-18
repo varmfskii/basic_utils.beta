@@ -1,8 +1,16 @@
 import re
+from enum import Flag, auto
 
 from msbasic.labels import gettgtlabs, renumber
 from msbasic.tokens import Token, no_ws
 from msbasic.variables import reid
+
+
+class OFlags(Flag):
+    I2X = auto()
+    Z2P = auto()
+    QUOTE = auto()
+    TEXTLEN = auto()
 
 
 class Optimizer:
@@ -152,17 +160,21 @@ class Optimizer:
             lines.append(line)
         self.data = lines
 
-    def opt(self, max_len=0, text_len=False, i2x=False, z2p=False):
+    def opt(self, max_len=0, flags=None):
+        if not flags:
+            flags = OFlags(0)
         # pack a basic program
-        if i2x:
-            self.i2x()
-        if z2p:
+        if OFlags.Z2P in flags:
             self.z2p()
+        if OFlags.I2X in flags:
+            self.i2x()
         self.data = no_ws(self.data)
         self.clean_labs()
         self.no_remarks()
-        self.data = reid(self.data)
-        self.merge_lines(max_len=max_len, text_len=text_len)
+        self.data = reid(self.pp, self.data)
+        self.merge_lines(max_len=max_len, text_len=OFlags.TEXTLEN in flags)
+        if OFlags.QUOTE in flags:
+            self.trim_quote()
         self.data = renumber(self.data, start=0, interval=1)
 
 
