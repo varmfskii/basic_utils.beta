@@ -4,7 +4,7 @@ import sys
 
 from commodore import Options, Parser, tokenize
 from msbasic.labels import renumber
-from msbasic.pack import pack, split_lines
+from msbasic.optimize import Optimizer, split_lines
 from msbasic.variables import reid
 
 
@@ -61,11 +61,12 @@ def packfn(args):
         else:
             assert False, f'unhandled option: [{o}]'
     pp = Parser(opts, open(opts.iname, 'rb').read())
-    data = pack(pp, text_len=text_len, max_len=max_len)
+    optimizer = Optimizer(pp)
+    optimizer.opt(text_len=text_len, max_len=max_len)
     if astokens:
-        open(opts.oname, 'wb').write(tokenize(data, opts))
+        open(opts.oname, 'wb').write(tokenize(optimizer.data, opts))
     else:
-        open(opts.oname, 'w').write(pp.deparse(data))
+        open(opts.oname, 'w').write(pp.deparse(optimizer.data))
 
 
 def reidfn(args):

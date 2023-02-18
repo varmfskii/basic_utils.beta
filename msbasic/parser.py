@@ -7,8 +7,14 @@ from msbasic.tokens import Token
 class Parser:
     rem_kw = ["'", 'REM']
     data_kw = ['DATA']
-    branch_kw = ['GO', 'THEN', 'ELSE']
-    ign_kw = ['SUB', 'TO']
+    go_kw = ['GO']
+    then_kw = ['THEN', 'ELSE']
+    to_kw = ['TO']
+    sub_kw = ['SUB']
+    let_kw = ['LET']
+    if_kw = ['IF']
+    branch_kw = go_kw + then_kw
+    ign_kw = to_kw + sub_kw
 
     code2kw = {}
     kw2code = {}
