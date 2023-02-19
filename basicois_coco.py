@@ -2,15 +2,16 @@
 
 import sys
 
-from commodore import Options, Parser, tokenize
+from basicois69 import Options, Parser, tokenize
 from msbasic.labels import renumber
-from msbasic.optimize import Optimizer, split_lines, OFlags
+from msbasic.optimize import Optimizer, OFlags, split_lines
 from msbasic.variables import reid
 
 
 def main(program, args):
     functions = {
         'd': detokenizefn, 'detokenize': detokenizefn,
+        'f': fixfn, 'fix_data': fixfn,
         'h': helpfn, 'help': helpfn,
         'p': packfn, 'pack': packfn,
         'ri': reidfn, 'reid': reidfn,
@@ -31,6 +32,16 @@ def detokenizefn(args):
         assert False, f'unhandled option [{o}]'
 
     pp = Parser(opts, open(opts.iname, 'rb').read())
+    open(opts.oname, 'w').write(pp.deparse())
+
+
+def fixfn(args):
+    opts = Options(args, ext='txt')
+
+    for o, a in opts.unused:
+        assert False, f'unhandled option [{o}]'
+
+    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=True)
     open(opts.oname, 'w').write(pp.deparse())
 
 
@@ -149,7 +160,7 @@ def unpackfn(args):
             assert False, f'unhandled option: [{o}]'
 
     pp = Parser(opts, open(opts.iname, 'rb').read())
-    data = split_lines(pp.full_parse)
+    data = split_lines(pp)
     open(opts.oname, 'w').write(pp.deparse(data, ws=ws))
 
 
@@ -174,11 +185,12 @@ def helpfn(program):
         "\tunpack\t\tsplit lines and insert whitespace\n"
         "\nCommon Options:\n"
         "\t-a<a>\t--address=<addy>\tStarting memory address\n"
-        "\t-b<d>\t--basic=<dialect\tBASIC dialect\n"
+        "\t-b<d>\t--basic=<dialect\tBasicois dialect\n"
+        "\t-c\t--cassette\t\tCassette file format\n"
+        "\t-d\t--disk\t\t\tDisk file format\n"
         "\t-h\t--help\t\t\tHelp message\n"
         "\t-i<n>\t--input=<file>\t\tinput file\n"
         "\t-o<n>\t--output=<file>\t\toutput file\n"
-        "\t-p\t--petscii\t\t\tuse petscii\n"
     )
 
 

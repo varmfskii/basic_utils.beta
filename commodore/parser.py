@@ -6,20 +6,29 @@ from .petscii import a2p, p2a
 
 
 class Parser(MSParser):
+    def __init__(self, opts, data=None, fix_data=False):
+        super().__init__(opts, data=data, be=False, fix_data=fix_data)
+        self.petscii = opts.petscii
+        self.mixed = opts.mixed
 
     def parse(self, data: list[int], fix_data=False) -> list[list[tuple]]:
-        if data[0] < 0x80 and data[1] < 0x80:
-            if self.opts.petscii:
-                data = a2p(data, mixed=self.opts.mixed)
-            self.full_parse = self.parse_txt("".join(map(chr, data)), fix_data=fix_data)
-        else:
+        binary = False
+        for d in data:
+            if d == 0:
+                binary = True
+                break
+        if binary:
             self.full_parse = self.parse_bin(data, fix_data=fix_data)
+        else:
+            if self.petscii:
+                data = a2p(data, mixed=self.mixed)
+            self.full_parse = self.parse_txt("".join(map(chr, data)), fix_data=fix_data)
         return self.full_parse
 
     def deparse_line(self, line, ws=False):
         out = super().deparse_line(line, ws=ws)
-        if self.opts.petscii:
-            out = "".join(map(chr, p2a(list(map(ord, out)), self.opts.mixed)))
+        if self.petscii:
+            out = "".join(map(chr, p2a(list(map(ord, out)), self.mixed)))
         return out
 
 

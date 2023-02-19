@@ -5,39 +5,30 @@ from msbasic.tokens import Token
 
 
 class Parser:
-    rem_kw = ["'", 'REM']
-    data_kw = ['DATA']
-    go_kw = ['GO']
-    then_kw = ['THEN', 'ELSE']
-    to_kw = ['TO']
-    sub_kw = ['SUB']
-    let_kw = ['LET']
-    if_kw = ['IF']
-    branch_kw = go_kw + then_kw
-    ign_kw = to_kw + sub_kw
-
-    code2kw = {}
-    kw2code = {}
-    kw_keys = []
     full_parse = None
-    opts = None
 
     def __init__(self, opts, data=None, be=True, fix_data=False):
-        self.opts = opts
         self.be = be
-        for (w, c) in opts.keywords:
-            self.code2kw[c] = w
-            self.kw2code[w] = c
-        self.kw_keys = list(self.kw2code.keys())
-        self.kw_keys.sort(key=(lambda x: -len(x)))
+        self.code2kw = opts.dialect.code2kw
+        self.kw2code = opts.dialect.kw2code
+        self.kw_keys = opts.dialect.kw_keys
+        self.specials = opts.dialect.specials
+        self.then_kw = self.specials['THEN'] + self.specials['ELSE']
+        self.branch_kw = self.specials['GO'] + self.specials['GOTO'] + self.specials['GOSUB'] + self.specials['THEN']
+        self.ign_kw = self.specials['TO'] + self.specials['SUB'] + self.specials['GOTO'] + self.specials['GOSUB']
         if data:
             self.parse(data, fix_data=fix_data)
 
     def parse(self, data: list[int], fix_data=False) -> list[list[tuple]]:
-        if data[0] < 128 and data[1] < 128:
-            self.full_parse = self.parse_txt("".join(map(chr, data)), fix_data=fix_data)
-        else:
+        binary = False
+        for d in data:
+            if d == 0:
+                binary = True
+                break
+        if binary:
             self.full_parse = self.parse_bin(data, fix_data=fix_data)
+        else:
+            self.full_parse = self.parse_txt("".join(map(chr, data)), fix_data=fix_data)
         return self.full_parse
 
     def parse_bin(self, data: list[int], fix_data=False) -> list[list[tuple]]:
@@ -59,14 +50,14 @@ class Parser:
                     c3 = c2 * 0x100 + data[2]
                 else:
                     c3 = c2 * 0x100
-                if line[-1][0] == Token.KW and line[-1][1].upper() in self.rem_kw:
+                if line[-1][0] == Token.KW and line[-1][1].upper() in self.specials['REM']:
                     rem = ''
                     while data[0] != 0:
                         rem += chr(data[0])
                         data = data[1:]
                     if rem != '':
                         line.append((Token.REM, rem))
-                elif line[-1][0] == Token.KW and line[-1][1].upper() in self.data_kw:
+                elif line[-1][0] == Token.KW and line[-1][1].upper() in self.specials['REM']:
                     data_data = ''
                     while data[0] != 0 and data[0] != ord(':'):
                         data_data += chr(data[0])
@@ -164,7 +155,7 @@ class Parser:
         new_line = []
         data = None
         for token in line:
-            if token[0] == Token.KW and token[1].upper() in self.data_kw:
+            if token[0] == Token.KW and token[1].upper() in self.specials['DATA']:
                 if len(new_line) and new_line[-1][0] == ord(':'):
                     new_line = new_line[:-1]
             elif token[0] == Token.DATA:
@@ -180,7 +171,7 @@ class Parser:
         if data:
             if len(new_line) > 1 or len(new_line) == 1 and new_line[0][0] != Token.LABEL:
                 new_line.append((ord(':'), ':'))
-            new_line += [(Token.KW, self.data_kw[0], self.kw2code[self.data_kw[0]]),
+            new_line += [(Token.KW, self.specials['DATA'][0], self.kw2code[self.specials['DATA'][0]]),
                          (Token.DATA, ' ' + data)]
         return new_line
 
@@ -250,11 +241,11 @@ class Parser:
             linein = linein[match.end():]
             while linein != '':
                 if len(line) > 0:
-                    if line[-1][0] == Token.KW and line[-1][1].upper() in self.rem_kw:
+                    if line[-1][0] == Token.KW and line[-1][1].upper() in self.specials['REM']:
                         line.append((Token.REM, linein))
                         linein = ''
                         continue
-                    if line[-1][0] == Token.KW and line[-1][1].upper() in self.data_kw:
+                    if line[-1][0] == Token.KW and line[-1][1].upper() in self.specials['DATA']:
                         match = re.match('[^:]+', linein)
                         if match:
                             ml = match.end()

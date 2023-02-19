@@ -5,15 +5,15 @@ working/beta directory
 A collection of python scripts for processing BASIC program files for
 vintage computers.
 
-## Global options: &lt;command&gt; &lt;function&gt; [&lt;options&gt;] [&lt;infile&gt;] [&lt;outfile&gt;]  
+## Global options: `<command> <function> [<options>] [<infile>] [<outfile>]`  
 
--a/--address: set starting address for tokenized code
+`-a`/`--address`: set starting address for tokenized code
 
--h/--help: display function level help info
+`-h`/`--help`: display function level help info
 
--i/--input: input file name
+`-i`/`--input`: input file name
 
--o/--output: output file name
+`-o`/`--output`: output file name
 
 ## Supported Machines
 
@@ -21,39 +21,39 @@ vintage computers.
 
     * General options
     
-      -b/--basic: select basic dialect (cb, ecb, decb, secb, sdecb, dragon, ddos)
+      `-b`/`--basic`: select basic dialect (cb, ecb, decb, secb, sdecb, dragon, ddos)
       
-      -c/--cassette: tokenized files in cassette format
+      `-c`/`--cassette`: tokenized files in cassette format
       
-      -d/--disk: tokenized file in disk format
+      `-d`/`--disk`: tokenized file in disk format
 
-    * d/detokenize
+    * `d`/`detokenize`
 
       Convert a tokenized BASIC program into text (text output only)
       
-    * h/help
+    * `h`/`help`
     
       Print command level help summary
 
-    * p/pack
+    * `p`/`pack`
 
       Make a BASIC program take as little space as possible. Allows for certain optimizations.
       
       * Options
       
-        -P/--point: convert zero (0) constants to "."
+        `-P`/`--point`: convert zero (0) constants to "."
         
-        -X/--hex: convert integer constants from 0-65535 to hex (&HXXXX) form
+        `-X`/`--hex`: convert integer constants from 0-65535 to hex (&HXXXX) form
         
-        -k/--token-len: line length is computed from tokenized form
+        `-k`/`--token-len`: line length is computed from tokenized form
         
-        -m/--maxline: set maximum line length
+        `-m`/`--maxline`: set maximum line length
         
-        -t/--text: output as text file
+        `-t`/`--text`: output as text file
         
-        -x/--text-len: line length is computed from text form        
+        `-x`/`--text-len`: line length is computed from text form        
 
-    * ri/reid
+    * `ri`/`reid`
 
       Transform variable names. This allows source code with long
       meaningful variable names to fit the restrictions of BASIC. It
@@ -61,32 +61,31 @@ vintage computers.
       
       * Options
 
-        -t/--text: output as text file
+        `-t`/`--text`: output as text file
         
-    * rn/renum/renumber
+    * `rn`/`renum`/`renumber`
 
       Adjust line numbers
-
       
       * Options
 
-        -s/--start: starting line number
+        `-s`/`--start`: starting line number
         
-        -t/--text: output as text file
+        `-t`/`--text`: output as text file
         
-        -v/--interval: line number interval
+        `-v`/`--interval`: line number interval
         
-    * t/tokenize
+    * `t`/`tokenize`
 
       Convert BASIC program in text form to tokenized form (tokenized output only)
       
-    * u/unpack
+    * `u`/`unpack`
     
       Split lines and add whitespace for readability (text output only)
       
       * Options
 
-        -w/--no-whitespace: do not add unnecessary whitespace
+        `-w`/`--no-whitespace`: do not add unnecessary whitespace
         
 * Commodore Machines: commodore.py
 

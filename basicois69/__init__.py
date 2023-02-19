@@ -2,13 +2,12 @@ import sys
 
 from msbasic.options import Options as BaseOptions
 from msbasic.tokens import tokenize_line
-from .dialects import DIALECTS, SDECB
+from .dialects import DIALECTS, DBCSE
 from .parser import Parser
 
 
 class Options(BaseOptions):
     disk = None
-    isdragon = False
     sopts = "b:cd" + BaseOptions.sopts
     lopts = ["basic=", "cassette", "disk"] + BaseOptions.lopts
     usage = BaseOptions.usage + [
@@ -25,7 +24,7 @@ class Options(BaseOptions):
             if a in DIALECTS.keys():
                 self.dialect = DIALECTS[a]()
             elif a == "help":
-                print("Supported self.DIALECTS:")
+                print("Supported dialects:")
                 for key in DIALECTS.keys():
                     print(f'\t{key}:\t{DIALECTS[key].id}')
                 sys.exit(0)
@@ -42,14 +41,11 @@ class Options(BaseOptions):
 
     def post(self):
         if self.dialect is None:
-            self.dialect = SDECB()
-        if not self.disk:
+            self.dialect = DBCSE()
+        if self.disk is None:
             self.disk = self.dialect.disk
-        self.isdragon = self.dialect.dragon
         if self.address == 0x0000:
-            if self.dialect.dragon:
-                self.address = 0x2401
-            elif self.disk or (self.disk is None and self.dialect.disk):
+            if self.disk or (self.disk is None and self.dialect.disk):
                 self.address = 0x2601
             else:
                 self.address = 0x25fe

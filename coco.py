@@ -56,7 +56,6 @@ def packfn(args):
     ]
     lopts = ['token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
     astokens = True
-    text_len = False
     oflags = OFlags(0)
     opts = Options(args, sopts='PQXkm:tx', lopts=lopts, usage=usage, ext='pack')
     max_len = 0
@@ -68,7 +67,7 @@ def packfn(args):
         elif o in ['-X', '--hex']:
             oflags |= OFlags.I2X
         elif o in ['-k', '--token-len']:
-            oflags |= OFlags.TEXTLEN
+            oflags &= ~OFlags.TEXTLEN
         elif o in ['-m', '--maxline']:
             max_len = int(a)
             if max_len < 0:
@@ -77,7 +76,7 @@ def packfn(args):
         elif o in ['-t', '--text']:
             astokens = False
         elif o in ['-x', '--text-len']:
-            text_len = True
+            oflags |= OFlags.TEXTLEN
         else:
             assert False, f'unhandled option: [{o}]'
     pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=True)

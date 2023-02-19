@@ -5,12 +5,9 @@ from msbasic.parser import Parser as MSParser
 
 
 class Parser(MSParser):
-
     def parse(self, data: list[int], fix_data=False) -> list[list[tuple]]:
-        if data[0] == 0xff:  # decb
+        if data[0] == 0xff: # disque
             self.full_parse = self.parse_bin(data[3:], fix_data=fix_data)
-        elif data[0] == 0x55:  # ddos
-            self.full_parse = self.parse_bin(data[9:], fix_data=fix_data)
         else:
             binary = False
             for d in data:
