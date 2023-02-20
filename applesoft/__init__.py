@@ -1,124 +1,63 @@
 from msbasic.options import Options as BaseOptions
+from msbasic.dialect import Dialect
+from msbasic.tokens import tokenize_line
 
-kw = [
-    ("END", 0x80),
-    ("FOR", 0x81),
-    ("NEXT", 0x82),
-    ("DATA", 0x83),
-    ("INPUT", 0x84),
-    ("DEL", 0x85),
-    ("DIM", 0x86),
-    ("READ", 0x87),
-    ("GR", 0x88),
-    ("TEXT", 0x89),
-    ("PR #", 0x8A),
-    ("IN #", 0x8B),
-    ("CALL", 0x8C),
-    ("PLOT", 0x8D),
-    ("HLIN", 0x8E),
-    ("VLIN", 0x8F),
-    ("HGR2", 0x90),
-    ("HGR", 0x91),
-    ("HCOLOR=", 0x92),
-    ("HPLOT", 0x93),
-    ("DRAW", 0x94),
-    ("XDRAW", 0x95),
-    ("HTAB", 0x96),
-    ("HOME", 0x97),
-    ("ROT=", 0x98),
-    ("SCALE=", 0x99),
-    ("SHLOAD", 0x9A),
-    ("TRACE", 0x9B),
-    ("NOTRACE", 0x9C),
-    ("NORMAL", 0x9D),
-    ("INVERSE", 0x9E),
-    ("FLASH", 0x9F),
-    ("COLOR=", 0xA0),
-    ("POP", 0xA1),
-    ("VTAB", 0xA2),
-    ("HIMEM:", 0xA3),
-    ("LOMEM:", 0xA4),
-    ("ONERR", 0xA5),
-    ("RESUME", 0xA6),
-    ("RECALL", 0xA7),
-    ("STORE", 0xA8),
-    ("SPEED=", 0xA9),
-    ("LET", 0xAA),
-    ("GOTO", 0xAB),
-    ("RUN", 0xAC),
-    ("IF", 0xAD),
-    ("RESTORE", 0xAE),
-    ("&", 0xAF),
-    ("GOSUB", 0xB0),
-    ("RETURN", 0xB1),
-    ("REM", 0xB2),
-    ("STOP", 0xB3),
-    ("ON", 0xB4),
-    ("WAIT", 0xB5),
-    ("LOAD", 0xB6),
-    ("SAVE", 0xB7),
-    ("DEF FN", 0xB8),
-    ("POKE", 0xB9),
-    ("PRINT", 0xBA),
-    ("CONT", 0xBB),
-    ("LIST", 0xBC),
-    ("CLEAR", 0xBD),
-    ("GET", 0xBE),
-    ("NEW", 0xBF),
-    ("TAB", 0xC0),
-    ("TO", 0xC1),
-    ("FN", 0xC2),
-    ("SPC(", 0xC3),
-    ("THEN", 0xC4),
-    ("AT", 0xC5),
-    ("NOT", 0xC6),
-    ("STEP", 0xC7),
-    ("+", 0xC8),
-    ("-", 0xC9),
-    ("*", 0xCA),
-    ("/", 0xCB),
-    (";", 0xCC),
-    ("AND", 0xCD),
-    ("OR", 0xCE),
-    (">", 0xCF),
-    ("=", 0xD0),
-    ("<", 0xD1),
-    ("SGN", 0xD2),
-    ("INT", 0xD3),
-    ("ABS", 0xD4),
-    ("USR", 0xD5),
-    ("FRE", 0xD6),
-    ("SCRN (", 0xD7),
-    ("PDL", 0xD8),
-    ("POS", 0xD9),
-    ("SQR", 0xDA),
-    ("RND", 0xDB),
-    ("LOG", 0xDC),
-    ("EXP", 0xDD),
-    ("COS", 0xDE),
-    ("SIN", 0xDF),
-    ("TAN", 0xE0),
-    ("ATN", 0xE1),
-    ("PEEK", 0xE2),
-    ("LEN", 0xE3),
-    ("STR$", 0xE4),
-    ("VAL", 0xE5),
-    ("ASC", 0xE6),
-    ("CHR$", 0xE7),
-    ("LEFT$", 0xE8),
-    ("RIGHT$", 0xE9),
-    ("MID$", 0xEA)
-]
 
-rem = ["REM"]
+class Applesoft(Dialect):
+    keywords = [
+        ("&", 0xAF), ("*", 0xCA), ("+", 0xC8), ("-", 0xC9), ("/", 0xCB),
+        (";", 0xCC), ("<", 0xD1), ("=", 0xD0), (">", 0xCF), ("ABS", 0xD4),
+        ("AND", 0xCD), ("ASC", 0xE6), ("AT", 0xC5), ("ATN", 0xE1),
+        ("CALL", 0x8C), ("CHR$", 0xE7), ("CLEAR", 0xBD), ("COLOR=", 0xA0),
+        ("CONT", 0xBB), ("COS", 0xDE), ("DATA", 0x83), ("DEF FN", 0xB8),
+        ("DEL", 0x85), ("DIM", 0x86), ("DRAW", 0x94), ("END", 0x80),
+        ("EXP", 0xDD), ("FLASH", 0x9F), ("FN", 0xC2), ("FOR", 0x81),
+        ("FRE", 0xD6), ("GET", 0xBE), ("GOSUB", 0xB0), ("GOTO", 0xAB),
+        ("GR", 0x88), ("HCOLOR=", 0x92), ("HGR", 0x91), ("HGR2", 0x90),
+        ("HIMEM:", 0xA3), ("HLIN", 0x8E), ("HOME", 0x97), ("HPLOT", 0x93),
+        ("HTAB", 0x96), ("IF", 0xAD), ("IN #", 0x8B), ("INPUT", 0x84),
+        ("INT", 0xD3), ("INVERSE", 0x9E), ("LEFT$", 0xE8), ("LEN", 0xE3),
+        ("LET", 0xAA), ("LIST", 0xBC), ("LOAD", 0xB6), ("LOG", 0xDC),
+        ("LOMEM:", 0xA4), ("MID$", 0xEA), ("NEW", 0xBF), ("NEXT", 0x82),
+        ("NORMAL", 0x9D), ("NOT", 0xC6), ("NOTRACE", 0x9C), ("ON", 0xB4),
+        ("ONERR", 0xA5), ("OR", 0xCE), ("PDL", 0xD8), ("PEEK", 0xE2),
+        ("PLOT", 0x8D), ("POKE", 0xB9), ("POP", 0xA1), ("POS", 0xD9),
+        ("PR #", 0x8A), ("PRINT", 0xBA), ("READ", 0x87), ("RECALL", 0xA7),
+        ("REM", 0xB2), ("RESTORE", 0xAE), ("RESUME", 0xA6), ("RETURN", 0xB1),
+        ("RIGHT$", 0xE9), ("RND", 0xDB), ("ROT=", 0x98), ("RUN", 0xAC),
+        ("SAVE", 0xB7), ("SCALE=", 0x99), ("SCRN (", 0xD7), ("SGN", 0xD2),
+        ("SHLOAD", 0x9A), ("SIN", 0xDF), ("SPC(", 0xC3), ("SPEED=", 0xA9),
+        ("SQR", 0xDA), ("STEP", 0xC7), ("STOP", 0xB3), ("STORE", 0xA8),
+        ("STR$", 0xE4), ("TAB", 0xC0), ("TAN", 0xE0), ("TEXT", 0x89),
+        ("THEN", 0xC4), ("TO", 0xC1), ("TRACE", 0x9B), ("USR", 0xD5),
+        ("VAL", 0xE5), ("VLIN", 0x8F), ("VTAB", 0xA2), ("WAIT", 0xB5),
+        ("XDRAW", 0x95)
+    ]
+
+    specials = {
+        'DATA': ['DATA'], 'ELSE': [], 'FOR': ['FOR'], 'GO': [],
+        'GOSUB': ['GOSUB'], 'GOTO': ['GOTO'], 'IF': ['IF'], 'NEXT': ['NEXT'],
+        'REM': ['REM'], 'SUB': [], 'THEN': ['THEN'], 'TO': []
+    }
 
 
 class Options(BaseOptions):
-    global kw
-    global rem
+    dialect = Applesoft()
 
-    keywords = kw
-    remarks = rem
+    def post(self):
+        if self.address == 0:
+            self.address = 0x0801
+
+
+def tokenize(data, opts):
+    # convert a parsed file into tokenized BASIC file
+    address = opts.address
+    tokenized = []
+    for line in data:
+        line_tokens = tokenize_line(line, be=False)
+        address += 2 + len(line_tokens)
+        tokenized += [address & 0xff, address // 0x0100] + line_tokens
+    return bytearray(tokenized)
 
 
 if __name__ == "__main__":
