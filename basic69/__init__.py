@@ -1,7 +1,7 @@
 import sys
 
 from msbasic.options import Options as BaseOptions
-from msbasic.tokens import tokenize_line
+from msbasic.tokens import tokenize as mstokenize
 from .dialects import DIALECTS, SDECB
 from .parser import Parser
 
@@ -58,12 +58,7 @@ class Options(BaseOptions):
 def tokenize(data, opts):
     # convert a parsed file into tokenized BASIC file
     tokenized = []
-    address = opts.address
-    for line in data:
-        line_tokens = tokenize_line(line)
-        address += 2 + len(line_tokens)
-        tokenized += [address // 0x100, address & 0xff] + line_tokens
-    tokenized += [0, 0]
+    tokenized = mstokenize(data, opts) + [0, 0]
     if opts.disk and opts.isdragon:
         val = len(tokenized)
         tokenized = [0x55, 0x01, 0x24, 0x01, val // 256, val & 0xff, 0x8b, 0x8d, 0xaa] + tokenized

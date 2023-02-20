@@ -22,6 +22,21 @@ class Token(Enum):
         return self.name
 
 
+def tokenize(data, opts, be=True):
+    # convert a parsed file into tokenized BASIC file
+    address = opts.address
+    tokenized = []
+    for line in data:
+        line_tokens = tokenize_line(line, be=be)
+        address += 2 + len(line_tokens)
+        if be:
+            tokenized += [address // 0x0100, address & 0xff] + line_tokens
+        else:
+            tokenized += [address & 0xff, address // 0x0100] + line_tokens
+    return bytearray(tokenized)
+
+
+
 def tokenize_line(line, be=True):
     # convert a parsed line into the tokenized format for a BASIC file
     val = int(line[0][1])

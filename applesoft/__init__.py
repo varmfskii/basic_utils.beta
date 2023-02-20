@@ -1,6 +1,6 @@
 from msbasic.options import Options as BaseOptions
 from msbasic.dialect import Dialect
-from msbasic.tokens import tokenize_line
+from msbasic.tokens import tokenize
 
 
 class Applesoft(Dialect):
@@ -47,17 +47,6 @@ class Options(BaseOptions):
     def post(self):
         if self.address == 0:
             self.address = 0x0801
-
-
-def tokenize(data, opts):
-    # convert a parsed file into tokenized BASIC file
-    address = opts.address
-    tokenized = []
-    for line in data:
-        line_tokens = tokenize_line(line, be=False)
-        address += 2 + len(line_tokens)
-        tokenized += [address & 0xff, address // 0x0100] + line_tokens
-    return bytearray(tokenized)
 
 
 if __name__ == "__main__":

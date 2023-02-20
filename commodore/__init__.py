@@ -1,7 +1,7 @@
 import sys
 
 from msbasic.options import Options as BaseOptions
-from msbasic.tokens import tokenize_line
+from msbasic.tokens import tokenize_line as mstokenize
 from .dialects import DIALECTS, C2
 from .parser import Parser
 
@@ -52,10 +52,7 @@ def tokenize(data, opts):
     # convert a parsed file into tokenized BASIC file
     address = opts.address
     tokenized = [address & 0xff, address // 0x100]
-    for line in data:
-        line_tokens = tokenize_line(line, be=False)
-        address += 2 + len(line_tokens)
-        tokenized += [address & 0xff, address // 0x0100] + line_tokens
+    tokenized += mstokenize(data, opts, be=False)
     return bytearray(tokenized)
 
 
