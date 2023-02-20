@@ -9,31 +9,19 @@ from .parser import Parser
 class Options(BaseOptions):
     disk = None
     isdragon = False
-    sopts = "b:cd" + BaseOptions.sopts
-    lopts = ["basic=", "cassette", "disk"] + BaseOptions.lopts
+    sopts = "cd" + BaseOptions.sopts
+    lopts = ["cassette", "disk"] + BaseOptions.lopts
     usage = BaseOptions.usage + [
-        '\t-b\t--basic=<dialect>\tbasic dialect\n',
         '\t-c\t--cassette\t\ttokenized cassette file\n',
         '\t-d\t--disk\t\t\ttokenized disk file (default)\n'
     ]
 
     dialect = None
+    dialects = DIALECTS
 
     def subopts(self, other):
         (o, a) = other
-        if o in ["-b", "--basic"]:
-            if a in DIALECTS.keys():
-                self.dialect = DIALECTS[a]()
-            elif a == "help":
-                print("Supported self.DIALECTS:")
-                for key in DIALECTS.keys():
-                    print(f'\t{key}:\t{DIALECTS[key].id}')
-                sys.exit(0)
-            else:
-                sys.stderr.write(f'Unsupported dialect: {a}\n')
-                sys.stderr.write("--basic=help to list available dialects")
-                sys.exit(2)
-        elif o in ["-c", "--cassette"]:
+        if o in ["-c", "--cassette"]:
             self.disk = False
         elif o in ["-d", "--disk"]:
             self.disk = True
@@ -57,7 +45,6 @@ class Options(BaseOptions):
 
 def tokenize(data, opts):
     # convert a parsed file into tokenized BASIC file
-    tokenized = []
     tokenized = mstokenize(data, opts) + [0, 0]
     if opts.disk and opts.isdragon:
         val = len(tokenized)

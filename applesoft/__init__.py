@@ -1,6 +1,4 @@
-from msbasic.options import Options as BaseOptions
 from msbasic.dialect import Dialect
-from msbasic.tokens import tokenize
 
 
 class Applesoft(Dialect):
@@ -33,20 +31,12 @@ class Applesoft(Dialect):
         ("VAL", 0xE5), ("VLIN", 0x8F), ("VTAB", 0xA2), ("WAIT", 0xB5),
         ("XDRAW", 0x95)
     ]
-
     specials = {
         'DATA': ['DATA'], 'ELSE': [], 'FOR': ['FOR'], 'GO': [],
         'GOSUB': ['GOSUB'], 'GOTO': ['GOTO'], 'IF': ['IF'], 'NEXT': ['NEXT'],
         'REM': ['REM'], 'SUB': [], 'THEN': ['THEN'], 'TO': []
     }
-
-
-class Options(BaseOptions):
-    dialect = Applesoft()
-
-    def post(self):
-        if self.address == 0:
-            self.address = 0x0801
+    address = 0x0801
 
 
 if __name__ == "__main__":

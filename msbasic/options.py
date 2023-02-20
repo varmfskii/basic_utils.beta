@@ -1,8 +1,7 @@
 import getopt
 import sys
 
-keywords = []
-remarks = []
+from applesoft import Applesoft
 
 
 class Options:
@@ -13,6 +12,7 @@ class Options:
     oname = None
     unused = []
     address = 0
+    dialects = { 'apple': Applesoft }
     usage = [
         '\t-a\t--address=<addy>\t\t\tstarting address\n',
         '\t-h\t--help\t\t\tthis help\n',
@@ -43,6 +43,18 @@ class Options:
         for o, a in opts:
             if o in ['-a', '--address']:
                 self.address = int(a)
+            elif o in ["-b", "--basic"]:
+                if a in self.dialects.keys():
+                    self.dialect = self.dialects[a]()
+                elif a == "help":
+                    print("Supported dialects:")
+                    for key in self.dialects.keys():
+                        print(f'\t{key}:\t{self.dialects[key].id}')
+                    sys.exit(0)
+                else:
+                    sys.stderr.write(f'Unsupported dialect: {a}\n')
+                    sys.stderr.write("--basic=help to list available dialects")
+                    sys.exit(2)
             elif o in ["-h", "--help:"]:
                 self.show_usage(sys.stdout)
                 sys.exit(0)
