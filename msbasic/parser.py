@@ -218,6 +218,15 @@ class Parser:
     def no_ws(tokens: list[tuple]) -> list[tuple]:
         rv = []
         for token in tokens:
+            if token[0] == Token.QUOTED:
+                new_val = ''
+                inquote = False
+                for c in token[1]:
+                    if inquote or c != ' ':
+                        new_val += c
+                    if c == '"':
+                        inquote = not inquote
+                token = (Token.QUOTED, new_val)
             if token[0] != Token.WS:
                 rv.append(token)
         return rv
