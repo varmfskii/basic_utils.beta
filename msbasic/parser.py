@@ -124,6 +124,7 @@ class Parser:
             elif label and ((token[0] == Token.KW and token[1].upper() not in self.ign_kw) or token[0] == ord(':')):
                 label = 0
             if token[0] == Token.ID:
+                label = 0
                 if ix + 2 < len(nows) and nows[ix + 1][0] == ord('$') and nows[ix + 2][0] == ord('('):
                     nows[ix] = (Token.STRARR, token[1])
                 elif ix + 1 < len(nows) and nows[ix + 1][0] == ord('$'):
