@@ -36,7 +36,6 @@ def tokenize(data, opts, be=True):
     return bytearray(tokenized)
 
 
-
 def tokenize_line(line, be=True):
     # convert a parsed line into the tokenized format for a BASIC file
     val = int(line[0][1])
@@ -108,13 +107,22 @@ def detokenize_body(data, pp, be=True):
     return pp, listing
 
 
-def no_ws(data: list[list[tuple]]) -> list[list[tuple]]:
+def no_ws(tokens: list[tuple]) -> list[tuple]:
     rv = []
-    for line in data:
-        new_line = []
-        for token in line:
-            if token[0] != Token.WS:
-                new_line.append(token)
-        if new_line:
-            rv.append(new_line)
+    for token in tokens:
+        if token[0] == Token.QUOTED:
+            new_val = ''
+            inquote = False
+            for c in token[1]:
+                if inquote or c != ' ':
+                    new_val += c
+                if c == '"':
+                    inquote = not inquote
+            token = (Token.QUOTED, new_val)
+        if token[0] != Token.WS:
+            rv.append(token)
     return rv
+
+
+def matchkw(token, kw):
+    return token[0] == Token.KW and token[1] in kw

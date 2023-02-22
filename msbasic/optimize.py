@@ -2,7 +2,7 @@ import re
 from enum import Flag, auto
 
 from msbasic.labels import gettgtlabs, renumber
-from msbasic.tokens import Token, no_ws
+from msbasic.tokens import Token, no_ws, matchkw
 from msbasic.variables import reid
 
 
@@ -27,7 +27,7 @@ class Optimizer:
 
         for line in self.data:
             for tix, token in enumerate(line):
-                if token[1].upper() in self.pp.rem_kw:
+                if matchkw(token, self.pp.specials['REM']):
                     if tix > 0 and line[tix - 1][0] == ord(':'):
                         line = line[:tix - 1]
                     else:
@@ -96,7 +96,7 @@ class Optimizer:
                     nextline = line
                     old_len = 5 + next_len
             for token in line:
-                if token[0] == Token.KW and token[1].upper() == 'IF':
+                if matchkw(token, self.pp.specials['IF']):
                     lines.append(nextline)
                     line_no += 1
                     nextline = []
@@ -119,14 +119,26 @@ class Optimizer:
             skip = False
             ll = len(line)
             for ix, token in enumerate(line):
+                print(token)
+                if matchkw(token, self.pp.specials['GO']):
+                    print("go")
+                if matchkw(token, self.pp.specials['TO']):
+                    print("to")
+                if matchkw(token, self.pp.specials['GOTO']):
+                    print("goto")
+                if matchkw("let", self.pp.specials['LET']):
+                    print("let")
                 if skip:
+                    print(skip)
                     skip = False
-                elif (1 < ix < ll - 1
-                      and token[0] == Token.KW and token[1].upper() in self.pp.go_kw
-                      and line[ix + 1][0] == Token.KW and line[ix + 1][1].upper() in self.pp.to_kw
-                      and line[ix - 1][0] == Token.KW and line[ix - 1][1].upper() in self.pp.then_kw):
+                elif (1 < ix < ll - 1 and matchkw(line[ix - 1], self.pp.then_kw)
+                      and matchkw(token, self.pp.specials['GO'])
+                      and matchkw(line[ix + 1], self.pp.specials['TO'])):
                     skip = True
-                elif token[0] != Token.KW or token[1] not in self.pp.let_kw:
+                elif not (matchkw(token, self.pp.specials['LET'])
+                          or (ix > 0 and matchkw(token, self.pp.specials['GOTO'])
+                              and matchkw(line[ix - 1], self.pp.then_kw))):
+                    print(f'append: {token}')
                     new_line.append(token)
             rv.append(new_line)
         self.data = rv

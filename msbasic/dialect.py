@@ -8,6 +8,7 @@ class Dialect:
         'GOSUB': ['GOSUB'],
         'GOTO': ['GOTO'],
         'IF': ['IF'],
+        'LET': ['LET'],
         'NEXT': ['NEXT'],
         'REM': ['REM', "'"],
         'SUB': ['SUB'],
