@@ -189,11 +189,12 @@ class Parser:
         parsed = []
         while len(data) >= 2 and data[0] or data[1]:
             if self.be:
-                tokens = [(Token.LABEL, data[2] * 0x0100 + data[3])]
+                tokens = [(Token.LABEL, str(data[2] * 0x0100 + data[3]))]
             else:
-                tokens = [(Token.LABEL, data[2] + data[3] * 0x0100)]
+                tokens = [(Token.LABEL, str(data[2] + data[3] * 0x0100))]
             data = data[4:]
             while data[0]:
+                # remark
                 if len(tokens) and matchkw(tokens[-1], self.specials['REM']):
                     remark = ''
                     while data[0]:
@@ -201,6 +202,7 @@ class Parser:
                         data = data[1:]
                     tokens.append((Token.REM, remark))
                     continue
+                # data statement
                 if len(tokens) and matchkw(tokens[-1], self.specials['DATA']):
                     data_data = ''
                     while data[0] and data[0] != ord(':'):
@@ -209,6 +211,7 @@ class Parser:
                     if data_data:
                         tokens.append((Token.DATA, data_data))
                     continue
+                # tokenized keyword
                 c1 = data[0]
                 if len(data) > 1:
                     c2 = c1 * 0x100 + data[1]
@@ -233,6 +236,19 @@ class Parser:
                     data = data[1:]
                     tokens.append((Token.KW, self.code2kw[c1], c1))
                     continue
+                # quoted string
+                if data[0] == ord('"'):
+                    quoted = '"'
+                    data = data[1:]
+                    while data[0] != 0 and data[0] != ord('"'):
+                        quoted += chr(data[0])
+                        data = data[1:]
+                    if data[0] == ord('"'):
+                        quoted += '"'
+                        data = data[1:]
+                    tokens.append((Token.QUOTED, quoted))
+                    continue
+                # potential id
                 next_chr = chr(data[0])
                 if 'A' <= next_chr <= 'Z' or 'a' <= next_chr <= 'z':
                     datum = ''
@@ -247,6 +263,7 @@ class Parser:
                     else:
                         tokens.append((Token.NONE, datum))
                     continue
+                # other
                 if len(tokens) and tokens[-1][0] == Token.NONE:
                     tokens[-1] = (Token.NONE, tokens[-1][1] + chr(data[0]))
                 else:
@@ -311,6 +328,7 @@ class Parser:
         return out
 
     def deparse_line(self, line, ws=False):
+        print(line)
         if line[0][0] == Token.LABEL:
             out = line[0][1] + ' '
             line = line[1:]
