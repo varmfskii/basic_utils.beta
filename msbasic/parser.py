@@ -328,7 +328,6 @@ class Parser:
         return out
 
     def deparse_line(self, line, ws=False):
-        print(line)
         if line[0][0] == Token.LABEL:
             out = line[0][1] + ' '
             line = line[1:]
