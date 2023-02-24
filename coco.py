@@ -31,7 +31,7 @@ def detokenizefn(args):
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
 
-    pp = Parser(opts, open(opts.iname, 'rb').read())
+    pp = Parser(opts, open(opts.iname, 'rb').read(), onepass=True)
     open(opts.oname, 'w').write(pp.deparse())
 
 
@@ -144,7 +144,7 @@ def tokenizefn(args):
     opts = Options(args, ext='tok')
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
-    pp = Parser(opts, open(opts.iname, 'rb').read())
+    pp = Parser(opts, open(opts.iname, 'rb').read(), onepass=True)
     open(opts.oname, 'wb').write(tokenize(pp.full_parse, opts))
 
 
