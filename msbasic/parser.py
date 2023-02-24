@@ -93,46 +93,46 @@ class Parser:
         while data != '':
             match = re.match(r'[A-Z][0-9A-Z]*\$\(', data)
             if match:
-                tokens += [(Token.STRARR, match.match(0)[:-2]), (ord('$'), '$'), (ord('('), '(')]
+                tokens += [(Token.STRARR, match.group(0)[:-2]), (ord('$'), '$'), (ord('('), '(')]
                 data = data[match.end():]
                 continue
             match = re.match(r'[A-Z][0-9A-Z]*\$\(', data)
             if match:
-                tokens += [(Token.STRARR, match.match(0)[:-1]), (ord('$'), '$')]
+                tokens += [(Token.STRARR, match.group(0)[:-1]), (ord('$'), '$')]
                 data = data[match.end():]
                 continue
             match = re.match(r'[A-Z][0-9A-Z]*\$', data)
             if match:
-                tokens += [(Token.STRARR, match.match(0)[:-1]), (ord('('), '(')]
+                tokens += [(Token.STRARR, match.group(0)[:-1]), (ord('('), '(')]
                 data = data[match.end():]
                 continue
             match = re.match(r'[A-Z][0-9A-Z]*', data)
             if match:
-                tokens.append((Token.ID, match.match(0)))
+                tokens.append((Token.ID, match.group(0)))
                 data = data[match.end():]
                 continue
             match = re.match(r'&H[0-9A-F]*', data)
             if match:
-                tokens.append((Token.HEX, match.match(0)))
+                tokens.append((Token.HEX, match.group(0)))
                 data = data[match.end():]
                 continue
             match = re.match(r'[0-9]*\.[0-9]*(E[+-]?[0-9]*)', data)
             if match:
-                tokens.append((Token.FLOAT, match.match(0)))
+                tokens.append((Token.FLOAT, match.group(0)))
                 data = data[match.end():]
                 continue
             match = re.match(r'[0-9]+', data)
             if match:
-                tokens.append((Token.NUM, match.match(0)))
+                tokens.append((Token.NUM, match.group(0)))
                 data = data[match.end():]
                 continue
             tokens.append((ord(data[0]), data[0]))
             data = data[1:]
         return [(Token.NONE, data)]
 
-    def kws_txt(self, data: str) -> [[tuple[int, str] or tuple[int, str, int]]]:
+    def kws_txt(self, data_i: [int]) -> [[tuple[int, str] or tuple[int, str, int]]]:
         parsed = []
-        data = cont_line(data)
+        data = cont_line("".join(map(chr, data_i)))
         for linein in re.split('[\n\r]+', data):
             if linein == "":
                 continue
@@ -156,7 +156,7 @@ class Parser:
                 if len(line) and matchkw(line[-1], self.specials['DATA']):
                     match = re.match('[^:]+', linein)
                     if match:
-                        line.append((Token.DATA, match.match(0)))
+                        line.append((Token.DATA, match.group(0)))
                         linein = linein[match.end():]
                     continue
 
@@ -178,9 +178,9 @@ class Parser:
 
                 match = re.match('.|([A-Za-z][0-9A-Za-z]*)', linein)
                 if len(line) and line[-1][0] == Token.NONE:
-                    line[-1] = (Token.NONE, line[-1][1] + match.match(0))
+                    line[-1] = (Token.NONE, line[-1][1] + match.group(0))
                 else:
-                    line.append((Token.NONE, match.match(0)))
+                    line.append((Token.NONE, match.group(0)))
                 linein = linein[match.end():]
             parsed.append(line)
         return parsed

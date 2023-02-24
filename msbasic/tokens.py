@@ -1,4 +1,5 @@
 from enum import Enum
+from msbasic.options import Options
 
 
 class Token(Enum):
@@ -22,7 +23,7 @@ class Token(Enum):
         return self.name
 
 
-def tokenize(data, opts, be=True):
+def tokenize(data: [[tuple[int, str] or tuple[int, str, int]]], opts: Options, be=True) -> [int]:
     # convert a parsed file into tokenized BASIC file
     address = opts.address
     tokenized = []
@@ -33,10 +34,10 @@ def tokenize(data, opts, be=True):
             tokenized += [address // 0x0100, address & 0xff] + line_tokens
         else:
             tokenized += [address & 0xff, address // 0x0100] + line_tokens
-    return bytearray(tokenized)
+    return tokenized
 
 
-def tokenize_line(line, be=True):
+def tokenize_line(line: [tuple[int, str] or tuple[int, str, int]], be=True) -> [int]:
     # convert a parsed line into the tokenized format for a BASIC file
     val = int(line[0][1])
     if be:
