@@ -46,7 +46,7 @@ extended_keywords = [
 
 class ECB(Dialect):
     id = 'Extended Color BASIC'
-    keywords = color_keywords
+    keywords = color_keywords + extended_keywords
     dragon = False
 
 
@@ -63,7 +63,7 @@ disk_keywords = [
 
 class DECB(Dialect):
     id = 'Disk Extended Color Basic'
-    keywords = color_keywords
+    keywords = color_keywords + extended_keywords + disk_keywords
     dragon = False
     disk = True
 
@@ -81,14 +81,14 @@ super_keywords = [
 
 class SECB(Dialect):
     id = 'Extended Color BASIC (CoCo 3)'
-    keywords = color_keywords
+    keywords = color_keywords + extended_keywords + super_keywords
     dragon = False
     disk = False
 
 
 class SDECB(Dialect):
     id = 'Disk Extended Color (CoCo 3)'
-    keywords = color_keywords
+    keywords = color_keywords + extended_keywords + super_keywords + disk_keywords
     dragon = False
     disk = True
 

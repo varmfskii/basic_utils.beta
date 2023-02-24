@@ -31,7 +31,7 @@ def detokenizefn(args):
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
 
-    pp = Parser(opts, open(opts.iname, 'rb').read())
+    pp = Parser(opts, open(opts.iname, 'rb').read(), onepass=True)
     open(opts.oname, 'w').write(pp.deparse())
 
 
@@ -47,7 +47,7 @@ def fixfn(args):
 
 def packfn(args):
     usage = [
-        "\t-P\t--point\t\tconvert 0 to .\n",
+        "\t-P\t--point\t\t\tconvert 0 to .\n",
         "\t-X\t--hex\t\t\tconvert integers to &Hhex form\n",
         "\t-k\t--token-len\t\tline length is for tokenized form\n",
         "\t-m\t--maxline=<num>\t\tmaximum line length\n",
@@ -144,7 +144,7 @@ def tokenizefn(args):
     opts = Options(args, ext='tok')
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
-    pp = Parser(opts, open(opts.iname, 'rb').read())
+    pp = Parser(opts, open(opts.iname, 'rb').read(), onepass=True)
     open(opts.oname, 'wb').write(tokenize(pp.full_parse, opts))
 
 
