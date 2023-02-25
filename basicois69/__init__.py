@@ -26,7 +26,7 @@ class Options(BaseOptions):
             elif a == "help":
                 print("Supported dialects:")
                 for key in DIALECTS.keys():
-                    print(f'\t{key}:\t{DIALECTS[key].id}')
+                    print(f'\t{key}:\t{DIALECTS[key].numvar}')
                 sys.exit(0)
             else:
                 sys.stderr.write(f'Unsupported dialect: {a}\n')

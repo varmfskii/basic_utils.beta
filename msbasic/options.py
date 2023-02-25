@@ -5,28 +5,26 @@ from applesoft import Applesoft
 
 
 class Options:
-    disk = True
     sopts = "a:hi:o:"
     lopts = ['address', "help", "input=", "output="]
-    iname = None
-    oname = None
-    unused = []
+    iname: str = None
+    oname: str = None
+    unused: [tuple[str, str]] = []
     address = 0
-    dialects = { 'apple': Applesoft }
+    dialects = {'apple': Applesoft}
     usage = [
         '\t-a\t--address=<addy>\t\tstarting address\n',
         '\t-h\t--help\t\t\tthis help\n',
         '\t-i<n>\t--input=<file>\t\tinput file\n',
         '\t-o<n>\t--output=<file>\t\toutput file\n',
     ]
-    keywords = []
-    remarks = []
+    keywords: [tuple[str, int]]
 
-    def __init__(self, args, sopts='', lopts=None, usage=None, ext='bas'):
+    def __init__(self, args: [str], sopts='', lopts: [str] = None, usage: [str] = None, ext='bas'):
         # parse options for msbasic utils including globally available options
-        if usage is None:
+        if not usage:
             usage = []
-        if lopts is None:
+        if not lopts:
             lopts = []
 
         self.sopts += sopts
@@ -49,7 +47,7 @@ class Options:
                 elif a == "help":
                     print("Supported dialects:")
                     for key in self.dialects.keys():
-                        print(f'\t{key}:\t{self.dialects[key].id}')
+                        print(f'\t{key}:\t{self.dialects[key].numvar}')
                     sys.exit(0)
                 else:
                     sys.stderr.write(f'Unsupported dialect: {a}\n')
@@ -85,12 +83,12 @@ class Options:
 
         self.post()
 
-    def subopts(self, other):
+    def subopts(self, other: tuple[str, str]):
         self.unused.append(other)
 
     def post(self):
         pass
-    
+
     def show_usage(self, fh):
         fh.write(f'Usage: {sys.argv[0]} [<opts>] [<iname>] [<oname>]\n')
         self.usage.sort()

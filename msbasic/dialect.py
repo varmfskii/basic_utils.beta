@@ -1,23 +1,14 @@
 class Dialect:
-    keywords = []
+    keywords: tuple[str, int]
     specials = {
-        'DATA': ['DATA'],
-        'ELSE': ['ELSE'],
-        'FOR': ['FOR'],
-        'GO': ['GO'],
-        'GOSUB': ['GOSUB'],
-        'GOTO': ['GOTO'],
-        'IF': ['IF'],
-        'LET': ['LET'],
-        'NEXT': ['NEXT'],
-        'REM': ['REM', "'"],
-        'SUB': ['SUB'],
-        'THEN': ['THEN'],
+        'DATA': ['DATA'], 'ELSE': ['ELSE'], 'FOR': ['FOR'], 'GO': ['GO'],
+        'GOSUB': ['GOSUB'], 'GOTO': ['GOTO'], 'IF': ['IF'], 'LET': ['LET'],
+        'NEXT': ['NEXT'], 'REM': ['REM', "'"], 'SUB': ['SUB'], 'THEN': ['THEN'],
         'TO': ['TO']
     }
-    kw2code = {}
-    code2kw = {}
-    kw_keys = []
+    kw2code: dict[str: int] = {}
+    code2kw: dict[int: str] = {}
+    kw_keys: [str] = []
 
     def __init__(self):
         for k, c in self.keywords:

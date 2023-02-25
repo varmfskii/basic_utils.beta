@@ -11,19 +11,21 @@ class Parser(MSParser):
         self.petscii = opts.petscii
         self.mixed = opts.mixed
 
-    def parse(self, data: list[int], fix_data=False) -> list[list[tuple]]:
+    def parse(self, data: [int], fix_data=False, onepass=False) -> [[tuple[int, str, any]]]:
         binary = False
         for d in data:
             if d == 0:
                 binary = True
                 break
         if binary:
-            self.full_parse = self.parse_bin(data, fix_data=fix_data)
+            self.full_parse = self.kws_bin(data)
         else:
             if self.petscii:
                 data = a2p(data, mixed=self.mixed)
-            self.full_parse = self.parse_txt("".join(map(chr, data)), fix_data=fix_data)
-        return self.full_parse
+            self.full_parse = self.kws_txt(data)
+        if onepass:
+            return self.full_parse
+        return self.get_tokens(fix_data=fix_data)
 
     def deparse_line(self, line, ws=False):
         out = super().deparse_line(line, ws=ws)

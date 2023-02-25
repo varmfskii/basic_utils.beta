@@ -52,7 +52,7 @@ def tokenize(data, opts):
     # convert a parsed file into tokenized BASIC file
     address = opts.address
     tokenized = [address & 0xff, address // 0x100]
-    tokenized += mstokenize(data, opts, be=False)
+    tokenized += mstokenize(data, opts)
     return bytearray(tokenized)
 
 

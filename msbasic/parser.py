@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import re
 
-from msbasic.tokens import Token, matchkw
+from msbasic.options import Options
+from msbasic.tokens import Token, TokenType
 
 
 class Parser:
     full_parse = None
 
-    def __init__(self, opts, data=None, be=True, fix_data=False, onepass=False):
+    def __init__(self, opts: Options, data: [int] or None = None, be=True, fix_data=False, onepass=False):
         self.be = be
         self.code2kw = opts.dialect.code2kw
         self.kw2code = opts.dialect.kw2code
@@ -16,10 +17,11 @@ class Parser:
         self.then_kw = self.specials['THEN'] + self.specials['ELSE']
         self.branch_kw = self.specials['GO'] + self.specials['GOTO'] + self.specials['GOSUB']
         self.ign_kw = self.specials['TO'] + self.specials['SUB']
+        self.gen = Token(m=opts.dialect.kw2code)
         if data:
             self.parse(data, fix_data=fix_data, onepass=onepass)
 
-    def parse(self, data: [int], fix_data=False, onepass=False) -> [[tuple[int, str] or tuple[int, str, int]]]:
+    def parse(self, data: [int], fix_data=False, onepass=False) -> [[Token]]:
         binary = False
         for d in data:
             if d == 0:
@@ -33,183 +35,32 @@ class Parser:
             return self.full_parse
         return self.get_tokens(fix_data=fix_data)
 
-    def get_tokens(self, data=None, fix_data=False) -> [[tuple[int, str] or tuple[int, str, int]]]:
-        if not data:
-            data = self.full_parse
-        parsed = []
-        data_data = ''
-        for line in data:
-            new_line = []
-            for token in line:
-                if token[0] == Token.NONE:
-                    new_line += self.parse_none(token[1])
-                elif token[0] == Token.DATA:
-                    new_data = ''
-                    inquote = False
-                    for c in token[1]:
-                        if inquote or c != ' ':
-                            new_data += c
-                        if c == '"':
-                            inquote = not inquote
-                    if fix_data:
-                        if data_data:
-                            data_data += ',' + new_data
-                        else:
-                            data_data = new_data
-                        if len(new_line) >= 2 and new_line[-2][0] == ord(':'):
-                            new_line = new_line[:-2]
-                        else:
-                            new_line = new_line[:-1]
-                    else:
-                        new_line.append((Token.DATA, new_data))
-                else:
-                    new_line.append(token)
-            if new_line:
-                label = 0
-                for ix, token in enumerate(new_line):
-                    # adjust to labels where applicable
-                    if (label and token[0] == Token.NUM) or (label == 2 and token[0] == Token.ID):
-                        new_line[ix] = (Token.LABEL, token[1])
-                    # setup for label detection
-                    if token[0] == Token.KW and token[1] in self.then_kw:
-                        label = 1
-                    elif token[0] == Token.KW and token[1] in self.branch_kw:
-                        label = 2
-                    elif label == 1 or (label == 2 and token[0] not in [Token.ID, Token.NUM, ord(',')]
-                                        and not (token[0] == Token.KW and token[1] in self.ign_kw)):
-                        label = 0
-                    else:
-                        pass
-                parsed.append(new_line)
-        if data_data:
-            parsed += [(Token.KW, 'DATA', self.kw2code['DATA']), (Token.DATA, data_data)]
-        self.full_parse = parsed
-        return self.full_parse
-
-    @staticmethod
-    def parse_none(data: str) -> [tuple[int, str]]:
-        data = re.sub(' ', '', data).upper()
-        tokens = []
-        while data != '':
-            match = re.match(r'[A-Z][0-9A-Z]*\$\(', data)
-            if match:
-                tokens += [(Token.STRARR, match.group(0)[:-2]), (ord('$'), '$'), (ord('('), '(')]
-                data = data[match.end():]
-                continue
-            match = re.match(r'[A-Z][0-9A-Z]*\$\(', data)
-            if match:
-                tokens += [(Token.STRARR, match.group(0)[:-1]), (ord('$'), '$')]
-                data = data[match.end():]
-                continue
-            match = re.match(r'[A-Z][0-9A-Z]*\$', data)
-            if match:
-                tokens += [(Token.STRARR, match.group(0)[:-1]), (ord('('), '(')]
-                data = data[match.end():]
-                continue
-            match = re.match(r'[A-Z][0-9A-Z]*', data)
-            if match:
-                tokens.append((Token.ID, match.group(0)))
-                data = data[match.end():]
-                continue
-            match = re.match(r'&H[0-9A-F]*', data)
-            if match:
-                tokens.append((Token.HEX, match.group(0)))
-                data = data[match.end():]
-                continue
-            match = re.match(r'[0-9]*\.[0-9]*(E[+-]?[0-9]*)', data)
-            if match:
-                tokens.append((Token.FLOAT, match.group(0)))
-                data = data[match.end():]
-                continue
-            match = re.match(r'[0-9]+', data)
-            if match:
-                tokens.append((Token.NUM, match.group(0)))
-                data = data[match.end():]
-                continue
-            tokens.append((ord(data[0]), data[0]))
-            data = data[1:]
-        return [(Token.NONE, data)]
-
-    def kws_txt(self, data_i: [int]) -> [[tuple[int, str] or tuple[int, str, int]]]:
-        parsed = []
-        data = cont_line("".join(map(chr, data_i)))
-        for linein in re.split('[\n\r]+', data):
-            if linein == "":
-                continue
-            match1 = re.match(' *([0-9]+) *', linein)
-            match2 = re.match(' *([A-Za-z][0-9A-Za-z]*): *', linein)
-            if match1:
-                line = [(Token.LABEL, match1.group(1))]
-                linein = linein[match1.end():]
-            elif match2:
-                line = [(Token.LABEL, match2.group(1))]
-                linein = linein[match2.end():]
-            else:
-                line = []
-                match = re.match(' *', linein)
-                linein = linein[match.end():]
-            while linein != '':
-                if len(line) and matchkw(line[-1], self.specials['REM']):
-                    line.append((Token.REM, linein))
-                    linein = ''
-                    continue
-                if len(line) and matchkw(line[-1], self.specials['DATA']):
-                    match = re.match('[^:]+', linein)
-                    if match:
-                        line.append((Token.DATA, match.group(0)))
-                        linein = linein[match.end():]
-                    continue
-
-                kw = self.match_kw(linein)
-                if kw:
-                    linein = linein[len(kw[1]):]
-                    line.append(kw)
-                    continue
-
-                match = re.match('"[^"]*"?', linein)
-                if match:
-                    ml = match.end()
-                    quoted = linein[:ml]
-                    if quoted[-1] != '"':
-                        quoted += '"'
-                    line.append((Token.QUOTED, quoted))
-                    linein = linein[ml:]
-                    continue
-
-                match = re.match('.|([A-Za-z][0-9A-Za-z]*)', linein)
-                if len(line) and line[-1][0] == Token.NONE:
-                    line[-1] = (Token.NONE, line[-1][1] + match.group(0))
-                else:
-                    line.append((Token.NONE, match.group(0)))
-                linein = linein[match.end():]
-            parsed.append(line)
-        return parsed
-
-    def kws_bin(self, data: [int]) -> [[tuple[int, str] or tuple[int, str, int]]]:
+    def kws_bin(self, data: [int]) -> [[Token]]:
         parsed = []
         while len(data) >= 2 and data[0] or data[1]:
             if self.be:
-                tokens = [(Token.LABEL, str(data[2] * 0x0100 + data[3]))]
+                v = data[2] * 0x0100 + data[3]
             else:
-                tokens = [(Token.LABEL, str(data[2] + data[3] * 0x0100))]
+                v = data[2] * 0x0100 + data[3]
+            tokens = [self.gen.label(str(v))]
             data = data[4:]
             while data[0]:
                 # remark
-                if len(tokens) and matchkw(tokens[-1], self.specials['REM']):
+                if len(tokens) and tokens[-1].matchkw(self.specials['REM']):
                     remark = ''
                     while data[0]:
                         remark += chr(data[0])
                         data = data[1:]
-                    tokens.append((Token.REM, remark))
+                    tokens.append(self.gen.rem(remark))
                     continue
                 # data statement
-                if len(tokens) and matchkw(tokens[-1], self.specials['DATA']):
+                if len(tokens) and tokens[-1].matchkw(self.specials['DATA']):
                     data_data = ''
                     while data[0] and data[0] != ord(':'):
                         data_data += chr(data[0])
                         data = data[1:]
                     if data_data:
-                        tokens.append((Token.DATA, data_data))
+                        tokens.append(self.gen.data(data_data))
                     continue
                 # tokenized keyword
                 c1 = data[0]
@@ -224,17 +75,17 @@ class Parser:
                 if c3 in self.code2kw.keys():
                     # 3-byte token
                     data = data[3:]
-                    tokens.append((Token.KW, self.code2kw[c3], c3))
+                    tokens.append(self.gen.kw(self.code2kw[c3]))
                     continue
                 if c2 in self.code2kw.keys():
                     # 2-byte token
                     data = data[2:]
-                    tokens.append((Token.KW, self.code2kw[c2], c2))
+                    tokens.append(self.gen.kw(self.code2kw[c2]))
                     continue
                 if c1 in self.code2kw.keys():
                     # 1-byte token
                     data = data[1:]
-                    tokens.append((Token.KW, self.code2kw[c1], c1))
+                    tokens.append(self.gen.kw(self.code2kw[c1]))
                     continue
                 # quoted string
                 if data[0] == ord('"'):
@@ -246,7 +97,7 @@ class Parser:
                     if data[0] == ord('"'):
                         quoted += '"'
                         data = data[1:]
-                    tokens.append((Token.QUOTED, quoted))
+                    tokens.append(self.gen.quoted(quoted))
                     continue
                 # potential id
                 next_chr = chr(data[0])
@@ -258,56 +109,192 @@ class Parser:
                         datum += next_chr
                         data = data[1:]
                         next_chr = chr(data[0])
-                    if len(tokens) and tokens[-1][0] == Token.NONE:
-                        tokens[-1] = (Token.NONE, tokens[-1][1] + datum)
+                    if len(tokens) and tokens[-1].isnone():
+                        tokens[-1].none_append(datum)
                     else:
-                        tokens.append((Token.NONE, datum))
+                        tokens.append(self.gen.none(datum))
                     continue
                 # other
-                if len(tokens) and tokens[-1][0] == Token.NONE:
-                    tokens[-1] = (Token.NONE, tokens[-1][1] + chr(data[0]))
+                if len(tokens) and tokens[-1].isnone():
+                    tokens[-1].none_append(chr(data[0]))
                 else:
-                    tokens.append((Token.NONE, chr(data[0])))
+                    tokens.append(self.gen.none(chr(data[0])))
                 data = data[1:]
+            data = data[1:]
             if tokens:
                 parsed.append(tokens)
         return parsed
 
+    def get_tokens(self, data: [[Token]] or None = None, fix_data=False) -> [[Token]]:
+        if not data:
+            data = self.full_parse
+        parsed = []
+        data_data = []
+        for line in data:
+            new_line = []
+            for token in line:
+                if token.isnone():
+                    new_line += self.parse_none(token.v)
+                elif fix_data and token.isdata():
+                    if data_data:
+                        data_data += token.v
+                    if len(new_line) >= 2 and new_line[-2].t == ord(':'):
+                        new_line = new_line[:-2]
+                    else:
+                        new_line = new_line[:-1]
+                else:
+                    new_line.append(token)
+            if new_line:
+                label = 0
+                for ix, token in enumerate(new_line):
+                    # adjust to labels where applicable
+                    if (label and token.isdec()) or (label == 2 and token.isid()):
+                        new_line[ix] = self.gen.label(token.r)
+                    # setup for label detection
+                    if token.matchkw(self.then_kw):
+                        label = 1
+                    elif token.matchke(self.branch_kw):
+                        label = 2
+                    elif label == 1 or (label == 2 and token.t not in [TokenType.NUMVAR, TokenType.DEC, ord(',')]
+                                        and not token.matchkw(self.ign_kw)):
+                        label = 0
+                    else:
+                        pass
+                parsed.append(new_line)
+        if data_data:
+            parsed += [self.gen.kw('DATA'), self.gen.data_list(data_data)]
+        self.full_parse = parsed
+        return self.full_parse
+
     @staticmethod
-    def split_none(s: str) -> [tuple[int, str]]:
+    def parse_none(data: str) -> [Token]:
+        data = re.sub(' ', '', data).upper()
+        tokens = []
+        while data != '':
+            match = re.match(r'[A-Z][0-9A-Z]*\$\(', data)
+            if match:
+                tokens += [Token.strarr(match.group(0)[:-2]), Token.other('$'), Token.other('(')]
+                data = data[match.end():]
+                continue
+            match = re.match(r'[A-Z][0-9A-Z]*\$', data)
+            if match:
+                tokens += [Token.strvar(match.group(0)[:-1]), Token.other('$')]
+                data = data[match.end():]
+                continue
+            match = re.match(r'[A-Z][0-9A-Z]*\$', data)
+            if match:
+                tokens += [Token.numarr(match.group(0)[:-1]), Token.other('(')]
+                data = data[match.end():]
+                continue
+            match = re.match(r'[A-Z][0-9A-Z]*', data)
+            if match:
+                tokens.append(Token.numvar(match.group(0)))
+                data = data[match.end():]
+                continue
+            match = re.match(r'&H[0-9A-F]*', data)
+            if match:
+                tokens.append(Token.hex(match.group(0)))
+                data = data[match.end():]
+                continue
+            match = re.match(r'[0-9]*\.[0-9]*(E[+-]?[0-9]*)', data)
+            if match:
+                tokens.append(Token.float(match.group(0)))
+                data = data[match.end():]
+                continue
+            match = re.match(r'[0-9]+', data)
+            if match:
+                tokens.append(Token.dec(match.group(0)))
+                data = data[match.end():]
+                continue
+            tokens.append(Token.other(data[0]))
+            data = data[1:]
+        return tokens
+
+    def kws_txt(self, data_i: [int]) -> [[Token]]:
+        parsed = []
+        data = cont_line("".join(map(chr, data_i)))
+        for linein in re.split('[\n\r]+', data):
+            if linein == "":
+                continue
+            match1 = re.match(' *([0-9]+) *', linein)
+            match2 = re.match(' *_([A-Za-z][0-9A-Za-z]*) *', linein)
+            if match1:
+                line = [self.gen.label(match1.group(1))]
+                linein = linein[match1.end():]
+            elif match2:
+                line = [self.gen.label(match2.group(1))]
+                linein = linein[match2.end():]
+            else:
+                line = []
+                match = re.match(' *', linein)
+                linein = linein[match.end():]
+            while linein != '':
+                if len(line) and line[-1].matchkw(self.specials['REM']):
+                    line.append(self.gen.rem(linein))
+                    linein = ''
+                    continue
+                if len(line) and line[-1].matchkw(self.specials['DATA']):
+                    match = re.match('[^:]+', linein)
+                    if match:
+                        line.append(self.gen.data(match.group(0)))
+                        linein = linein[match.end():]
+                    continue
+
+                kw = self.match_kw(linein)
+                if kw:
+                    linein = linein[len(kw.r):]
+                    line.append(kw)
+                    continue
+
+                match = re.match('"[^"]*"?', linein)
+                if match:
+                    ml = match.end()
+                    quoted = linein[:ml]
+                    if quoted[-1] != '"':
+                        quoted += '"'
+                    line.append(self.gen.quoted(quoted))
+                    linein = linein[ml:]
+                    continue
+
+                match = re.match('.|([A-Za-z][0-9A-Za-z]*)', linein)
+                if len(line) and line[-1].isnone():
+                    line[-1].none_append(match.group(0))
+                else:
+                    line.append(self.gen.none(match.group(0)))
+                linein = linein[match.end():]
+            parsed.append(line)
+        return parsed
+
+    @staticmethod
+    def split_none(s: str) -> [Token]:
         tokens = []
         while s != '':
             match = re.match('[0-9]*\\.[0-9]*', s)
             if match and match.end() > 0:
-                ml = match.end()
-                tokens.append((Token.FLOAT, s[:ml]))
-                s = s[ml:]
+                tokens.append(Token.float(match.group(0)))
+                s = s[match.end():]
                 continue
             match = re.match('[0-9]*(\\.[0-9]*)?[+-]?[Ee][0-9]*', s)
             if match and match.end() > 0:
-                ml = match.end()
-                tokens.append((Token.FLOAT, s[:ml]))
-                s = s[ml:]
+                tokens.append(Token.float(match.group(0)))
+                s = s[match.end():]
                 continue
             match = re.match('[0-9]*', s)
             if match and match.end() > 0:
-                ml = match.end()
-                tokens.append((Token.NUM, s[:ml]))
-                s = s[ml:]
+                tokens.append(Token.dec(match.group(0)))
+                s = s[match.end()]
                 continue
             match = re.match('&H[0-9A-Fa-f]*', s)
             if match and match.end() > 0:
-                ml = match.end()
-                tokens.append((Token.HEX, s[:ml]))
-                s = s[ml:]
+                tokens.append(Token.hex(match.group(0)))
+                s = s[match.end():]
                 continue
             match = re.match(' *', s)
             if match and match.end() > 0:
-                ml = match.end()
-                tokens.append((Token.WS, s[:ml]))
-                s = s[ml:]
+                tokens.append(Token.ws(match.group(0)))
+                s = s[match.end():]
                 continue
-            tokens.append((ord(s[0]), s[0]))
+            tokens.append(Token.other(s[0]))
             s = s[1:]
         return tokens
 
@@ -316,7 +303,7 @@ class Parser:
         for kw in self.kw_keys:
             kl = len(kw)
             if ll >= kl and kw == line[:kl].upper():
-                return Token.KW, kw, self.kw2code[kw]
+                return self.gen.kw(kw.upper())
         return None
 
     def deparse(self, data=None, ws=False) -> str:
@@ -324,26 +311,20 @@ class Parser:
         if not data:
             data = self.full_parse
         for line in data:
-            out += self.deparse_line(line, ws)
+            out += self.deparse_line(line, ws=ws) + '\n'
         return out
 
-    def deparse_line(self, line, ws=False):
-        if line[0][0] == Token.LABEL:
-            out = line[0][1] + ' '
+    def deparse_line(self, line: [Token], ws=False) -> str:
+        if line[0].islabel():
+            out = line[0].r + ' '
             line = line[1:]
         else:
             out = ' '
         for ix, token in enumerate(line):
-            if (token[0] == Token.KW and token[1][0].isalpha() and ix > 0
-                    and line[ix - 1][0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]):
+            if ((token.iskw() and token.r[0].isalpha() and ix > 0 and line[ix - 1].isvar())
+                    or (ws and out[-1].isalnum() and token.r[0].isalnum())):
                 out += ' '
-            if ws and out[-1].isalnum() and token[1][0].isalnum():
-                out += ' '
-            if token[0] in [Token.QUOTED, Token.DATA, Token.REM]:
-                out += token[1]
-            else:
-                out += token[1].upper()
-        out += '\n'
+            out += token.r
         return out
 
 

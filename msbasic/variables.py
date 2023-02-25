@@ -1,4 +1,4 @@
-from msbasic.tokens import no_ws, Token
+from msbasic.tokens import TokenType
 
 
 class IDError(RuntimeError):
@@ -7,7 +7,7 @@ class IDError(RuntimeError):
 
 def getidtype(ix, line, pp):
     # decide what kind of variable is pointed to by ix in line
-    if line[ix][0] != pp.ID:
+    if line[ix][0] != pp.NUMVAR:
         return None
     if ix + 1 < len(line) and line[ix + 1][1][0] == '$':
         if ix + 2 < len(line) and line[ix + 2][1][0] == '(':
@@ -18,29 +18,28 @@ def getidtype(ix, line, pp):
     return 'numvar'
 
 
-def getids(data: list[list[tuple]]) -> dict[Token, set]:
+def getids(data: [[tuple[int, str, any]]]) -> dict[TokenType, set]:
     # get a list of all variables used in a program
-    lines = no_ws(data)
     numvar = set()
     strvar = set()
     numarr = set()
     strarr = set()
 
-    for line in lines:
+    for line in data:
         for ix, token in enumerate(line):
-            if token[0] == Token.STRARR:
+            if token[0] == TokenType.STRARR:
                 strarr.add(token[1].upper())
-            elif token[0] == Token.STR:
+            elif token[0] == TokenType.STRVAR:
                 strvar.add(token[1].upper())
-            elif token[0] == Token.ARR:
+            elif token[0] == TokenType.NUMARR:
                 numarr.add(token[1].upper())
-            elif token[0] == Token.ID:
+            elif token[0] == TokenType.NUMVAR:
                 numvar.add(token[1].upper())
             else:
                 pass
 
-    return {Token.ID: numvar, Token.STR: strvar, Token.ARR: numarr,
-            Token.STRARR: strarr}
+    return {TokenType.NUMVAR: numvar, TokenType.STRVAR: strvar, TokenType.NUMARR: numarr,
+            TokenType.STRARR: strarr}
 
 
 def nextid(prev):
@@ -88,7 +87,7 @@ def reid(pp, data=None) -> list[list[tuple]]:
 
     for lix, line in enumerate(data):
         for tix, token in enumerate(line):
-            if token[0] in [Token.ID, Token.STR, Token.ARR, Token.STRARR]:
+            if token[0] in [TokenType.NUMVAR, TokenType.STRVAR, TokenType.NUMARR, TokenType.STRARR]:
                 data[lix][tix] = (token[0], mymap[token[0]][token[1].upper()])
 
     return data

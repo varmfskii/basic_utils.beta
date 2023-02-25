@@ -2,7 +2,8 @@
 
 import sys
 
-from applesoft import Options, tokenize
+from msbasic.options import Options
+from msbasic.tokens import tokenize
 from msbasic.parser import Parser
 from msbasic.labels import renumber
 from msbasic.optimize import Optimizer, split_lines, OFlags
