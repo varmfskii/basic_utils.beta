@@ -11,6 +11,7 @@ class OFlags(Flag):
     Z2P = auto()
     QUOTE = auto()
     TEXTLEN = auto()
+    FIXDATA = auto()
 
 
 class Optimizer:

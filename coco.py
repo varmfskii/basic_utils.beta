@@ -47,6 +47,7 @@ def fixfn(args):
 
 def packfn(args):
     usage = [
+        "\t-D\t--fix-data\t\tavoid DATA bug\n",
         "\t-P\t--point\t\t\tconvert 0 to .\n",
         "\t-X\t--hex\t\t\tconvert integers to &Hhex form\n",
         "\t-k\t--token-len\t\tline length is for tokenized form\n",
@@ -54,13 +55,15 @@ def packfn(args):
         "\t-t\t--text\t\t\toutput as text file\n",
         "\t-x\t--text-len\t\tline length is for untokenized form\n"
     ]
-    lopts = ['token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
+    lopts = ['fix-data', 'token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
     astokens = True
     oflags = OFlags(0)
-    opts = Options(args, sopts='PQXkm:tx', lopts=lopts, usage=usage, ext='pack')
+    opts = Options(args, sopts='DPQXkm:tx', lopts=lopts, usage=usage, ext='pack')
     max_len = 0
     for o, a in opts.unused:
-        if o in ['-P', '--point']:
+        if o in ['-D', '--fix-data']:
+            oflags |= OFlags.FIXDATA
+        elif o in ['-P', '--point']:
             oflags |= OFlags.Z2P
         elif o in ['-Q', '--quotes']:
             oflags |= OFlags.QUOTE
@@ -79,7 +82,7 @@ def packfn(args):
             oflags |= OFlags.TEXTLEN
         else:
             assert False, f'unhandled option: [{o}]'
-    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=True)
+    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=OFlags.FIXDATA in oflags)
     optimizer = Optimizer(pp)
     optimizer.opt(max_len=max_len, flags=oflags)
     if astokens:

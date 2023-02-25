@@ -164,8 +164,6 @@ class Parser:
         if data_data:
             parsed.append([self.gen.kw('DATA'), self.gen.data_list(data_data)])
         self.full_parse = parsed
-        for line in parsed:
-            print(line)
         return self.full_parse
 
     @staticmethod
