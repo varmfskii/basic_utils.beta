@@ -200,7 +200,7 @@ def get_len(pp: Parser, in_line: [Token], text_len: bool = False) -> int:
 
 def int2hex(token: Token) -> Token:
     if token.isdec() and 0 <= token.v < 0x10000:
-        return token.hex(f'&H{token.v:x}')
+        return token.hex(f'&H{token.v:X}')
     return token
 
 
