@@ -6,6 +6,7 @@ from msbasic.tokens import Token, TokenType
 
 
 class Parser:
+    spacer = list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"')
     full_parse = None
 
     def __init__(self, opts: Options, data: [int] or None = None, be=True, fix_data=False, onepass=False):
@@ -136,13 +137,12 @@ class Parser:
                 if token.isnone():
                     new_line += self.parse_none(token.v)
                 elif fix_data and token.isdata():
-                    if data_data:
-                        data_data += token.v
+                    data_data += token.v
                     if len(new_line) >= 2 and new_line[-2].t == ord(':'):
                         new_line = new_line[:-2]
                     else:
                         new_line = new_line[:-1]
-                else:
+                elif not fix_data or not token.matchkw(self.specials['DATA']):
                     new_line.append(token)
             if new_line:
                 label = 0
@@ -162,8 +162,10 @@ class Parser:
                         pass
                 parsed.append(new_line)
         if data_data:
-            parsed += [self.gen.kw('DATA'), self.gen.data_list(data_data)]
+            parsed.append([self.gen.kw('DATA'), self.gen.data_list(data_data)])
         self.full_parse = parsed
+        for line in parsed:
+            print(line)
         return self.full_parse
 
     @staticmethod
@@ -322,7 +324,7 @@ class Parser:
             out = ' '
         for ix, token in enumerate(line):
             if ((token.iskw() and token.r[0].isalpha() and ix > 0 and line[ix - 1].isvar())
-                    or (ws and out[-1] != ' ' and token.r[0].isalnum())):
+                    or (ws and out[-1] in self.spacer and token.r[0].isalnum())):
                 out += ' '
             out += token.r
         return out
