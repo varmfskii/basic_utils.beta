@@ -148,12 +148,12 @@ class Parser:
                 label = 0
                 for ix, token in enumerate(new_line):
                     # adjust to labels where applicable
-                    if (label and token.isdec()) or (label == 2 and token.isid()):
+                    if (label and token.isdec()) or (label == 2 and token.isvar()):
                         new_line[ix] = self.gen.label(token.r)
                     # setup for label detection
                     if token.matchkw(self.then_kw):
                         label = 1
-                    elif token.matchke(self.branch_kw):
+                    elif token.matchkw(self.branch_kw):
                         label = 2
                     elif label == 1 or (label == 2 and token.t not in [TokenType.NUMVAR, TokenType.DEC, ord(',')]
                                         and not token.matchkw(self.ign_kw)):
@@ -322,7 +322,7 @@ class Parser:
             out = ' '
         for ix, token in enumerate(line):
             if ((token.iskw() and token.r[0].isalpha() and ix > 0 and line[ix - 1].isvar())
-                    or (ws and out[-1].isalnum() and token.r[0].isalnum())):
+                    or (ws and out[-1] != ' ' and token.r[0].isalnum())):
                 out += ' '
             out += token.r
         return out

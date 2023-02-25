@@ -1,9 +1,9 @@
 from enum import Flag, auto
 
 from msbasic.labels import gettgtlabs, renumber
+from msbasic.parser import Parser
 from msbasic.tokens import Token
 from msbasic.variables import reid
-from msbasic.parser import Parser
 
 
 class OFlags(Flag):
@@ -17,7 +17,7 @@ class Optimizer:
     def __init__(self, parser: Parser, data: [int] or None = None):
         self.pp = parser
         if data:
-            self.data = data
+            self.data = self.pp.parse(data)
         else:
             self.data = parser.full_parse
 
@@ -68,7 +68,7 @@ class Optimizer:
             else:
                 if nextline:
                     if len(nextline) > 0 and len(line) > 0:
-                        nextline += [(ord(':'), ':')]
+                        nextline.append(Token.other(':'))
                         old_len += 1
                     nextline += line
                     old_len += next_len
@@ -188,9 +188,9 @@ def get_len(pp: Parser, in_line: [Token], text_len: bool = False) -> int:
     for token in line:
         if not token.iskw():
             len_acc += len(token.r)
-        elif token[2] < 0x100:
+        elif token.v < 0x100:
             len_acc += 1
-        elif token[2] < 0x10000:
+        elif token.v < 0x10000:
             len_acc += 2
         else:
             len_acc += 3

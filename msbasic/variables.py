@@ -1,24 +1,12 @@
-from msbasic.tokens import TokenType
+from msbasic.parser import Parser
+from msbasic.tokens import TokenType, Token
 
 
 class IDError(RuntimeError):
     pass
 
 
-def getidtype(ix, line, pp):
-    # decide what kind of variable is pointed to by ix in line
-    if line[ix][0] != pp.NUMVAR:
-        return None
-    if ix + 1 < len(line) and line[ix + 1][1][0] == '$':
-        if ix + 2 < len(line) and line[ix + 2][1][0] == '(':
-            return 'strarr'
-        return 'strvar'
-    if ix + 1 < len(line) and line[ix + 1][1][0] == '(':
-        return 'numarr'
-    return 'numvar'
-
-
-def getids(data: [[tuple[int, str, any]]]) -> dict[TokenType, set]:
+def getids(data: [[Token]]) -> dict[TokenType: set]:
     # get a list of all variables used in a program
     numvar = set()
     strvar = set()
@@ -27,14 +15,14 @@ def getids(data: [[tuple[int, str, any]]]) -> dict[TokenType, set]:
 
     for line in data:
         for ix, token in enumerate(line):
-            if token[0] == TokenType.STRARR:
-                strarr.add(token[1].upper())
-            elif token[0] == TokenType.STRVAR:
-                strvar.add(token[1].upper())
-            elif token[0] == TokenType.NUMARR:
-                numarr.add(token[1].upper())
-            elif token[0] == TokenType.NUMVAR:
-                numvar.add(token[1].upper())
+            if token.isstrarr():
+                strarr.add(token.r)
+            elif token.isstrvar():
+                strvar.add(token.r)
+            elif token.isnumarr():
+                numarr.add(token.r)
+            elif token.isnumvar():
+                numvar.add(token.r)
             else:
                 pass
 
@@ -42,7 +30,7 @@ def getids(data: [[tuple[int, str, any]]]) -> dict[TokenType, set]:
             TokenType.STRARR: strarr}
 
 
-def nextid(prev):
+def nextid(prev: str) -> str:
     # get the next available variable name
     if len(prev) == 0:
         return 'A'
@@ -63,7 +51,7 @@ def nextid(prev):
     return prev[0] + chr(ord(prev[1]) + 1)
 
 
-def getidmap(oldids, pp):
+def getidmap(oldids: [str], pp: Parser) -> dict[str: str]:
     # create a dictionary mapping old variable names to ordinalized variable names
     newids = {}
     newid = ''
@@ -75,7 +63,7 @@ def getidmap(oldids, pp):
     return newids
 
 
-def reid(pp, data=None) -> list[list[tuple]]:
+def reid(pp: Parser, data: [[Token]] = None) -> [[Token]]:
     # remap variable names in a program to ordialized variable names
     if not data:
         data = pp.full_parse
@@ -87,7 +75,8 @@ def reid(pp, data=None) -> list[list[tuple]]:
 
     for lix, line in enumerate(data):
         for tix, token in enumerate(line):
-            if token[0] in [TokenType.NUMVAR, TokenType.STRVAR, TokenType.NUMARR, TokenType.STRARR]:
-                data[lix][tix] = (token[0], mymap[token[0]][token[1].upper()])
+            if token.isvar():
+                data[lix][tix].r = mymap[token.t][token.v]
+                data[lix][tix].v = mymap[token.t][token.v]
 
     return data

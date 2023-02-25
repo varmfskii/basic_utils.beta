@@ -1,5 +1,6 @@
 import re
 from enum import Enum
+
 from msbasic.options import Options
 
 
@@ -21,10 +22,6 @@ class TokenType(Enum):
 
     def __repr__(self):
         return self.name
-
-
-def token_generator(opts):
-    return Token(o=opts)
 
 
 class Token:
@@ -70,17 +67,29 @@ class Token:
     def numvar(v: str):
         return Token(TokenType.NUMVAR, v, re.sub(' ', '', v).upper())
 
+    def isnumvar(self):
+        return self.t == TokenType.NUMVAR
+
     @staticmethod
     def strvar(v: str):
         return Token(TokenType.STRVAR, v, re.sub(' ', '', v).upper())
+
+    def isstrvar(self):
+        return self.t == TokenType.STRVAR
 
     @staticmethod
     def numarr(v: str):
         return Token(TokenType.NUMARR, v, re.sub(' ', '', v).upper())
 
+    def isnumarr(self):
+        return self.t == TokenType.NUMARR
+
     @staticmethod
     def strarr(v: str):
         return Token(TokenType.STRARR, v, re.sub(' ', '', v).upper())
+
+    def isstrarr(self):
+        return self.t == TokenType.STRARR
 
     def isvar(self):
         return self.t in [TokenType.NUMARR, TokenType.NUMVAR, TokenType.STRARR, TokenType.STRVAR]
@@ -88,6 +97,9 @@ class Token:
     @staticmethod
     def quoted(v: str):
         return Token(TokenType.QUOTED, v, v[1:-1])
+
+    def isquoted(self):
+        return self.t == TokenType.QUOTED
 
     @staticmethod
     def rem(v: str):
@@ -104,6 +116,9 @@ class Token:
     def data_list(d: [str]):
         return Token(TokenType.DATA, ','.join(d), d)
 
+    def isdata(self):
+        return self.t == TokenType.DATA
+
     @staticmethod
     def dec(v: str):
         return Token(TokenType.DEC, v, int(v))
@@ -113,7 +128,7 @@ class Token:
 
     @staticmethod
     def hex(v: str):
-        return Token(TokenType.HEX, v, int('0x' + v[2:]))
+        return Token(TokenType.HEX, v, int(v[2:], 16))
 
     def ishex(self):
         return self.t == TokenType.HEX
@@ -123,7 +138,10 @@ class Token:
 
     @staticmethod
     def float(v: str):
-        return Token(TokenType.FLOAT, v, float(v))
+        if v == '.':
+            return Token(TokenType, '.', 0)
+        else:
+            return Token(TokenType.FLOAT, v, float(v))
 
     def isfloat(self):
         return self.t == TokenType.FLOAT
