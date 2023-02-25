@@ -18,7 +18,7 @@ class Options(BaseOptions):
     petscii = False
     mixed = False
 
-    def subopts(self, other):
+    def subopts(self, other: tuple[str, str]):
         (o, a) = other
         if o in ['-b', '--basic']:
             if a in DIALECTS.keys():
@@ -48,7 +48,7 @@ class Options(BaseOptions):
             self.dialect = C2()
 
 
-def tokenize(data, opts):
+def tokenize(data: [int], opts: Options) -> bytearray:
     # convert a parsed file into tokenized BASIC file
     address = opts.address
     tokenized = [address & 0xff, address // 0x100]

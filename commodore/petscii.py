@@ -22,9 +22,9 @@ P2AM = {
     89: 121, 90: 122, 92: 163, 94: 8593, 95: 8592, 96: 129913,
     97: 65, 98: 66, 99: 67, 100: 68, 101: 69, 102: 70,
     103: 71, 104: 72, 105: 73, 106: 74, 107: 75, 108: 76,
-    109: 77, 110: 78, 111: 79, 112: 80, 113: 81, 114:
-        82, 115: 83, 116: 84, 117: 85, 118: 86, 119: 87,
-    120: 88, 121: 89, 122: 90, 123: 9532, 124: 129932, 125: 129932,
+    109: 77, 110: 78, 111: 79, 112: 80, 113: 81, 114: 82,
+    115: 83, 116: 84, 117: 85, 118: 86, 119: 87, 120: 88,
+    121: 89, 122: 90, 123: 9532, 124: 129932, 125: 129932,
     126: 129942, 127: 129944
 }
 A2PM = {
@@ -41,7 +41,7 @@ A2PM = {
 }
 
 
-def p2a(data, mixed=False):
+def p2a(data: [int], mixed=False) -> [int]:
     if mixed:
         c_map = P2AM
     else:
@@ -53,9 +53,10 @@ def p2a(data, mixed=False):
             out.append(c_map[c])
         else:
             out.append(c)
+    return out
 
 
-def a2p(data, mixed=False):
+def a2p(data: [int], mixed=False) -> [int]:
     if mixed:
         c_map = A2PM
     else:
@@ -67,3 +68,4 @@ def a2p(data, mixed=False):
             out.append(c_map[c])
         else:
             out.append(c)
+    return out
