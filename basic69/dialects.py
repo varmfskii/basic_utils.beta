@@ -1,4 +1,4 @@
-from msbasic.dialect import Dialect
+from msbasic.dialects import Dialect
 
 color_keywords = [
     ("'", 0x3A83), ("*", 0xAD), ("+", 0xAB), ("-", 0xAC), ("/", 0xAE),
@@ -48,6 +48,7 @@ class ECB(Dialect):
     id = 'Extended Color BASIC'
     keywords = color_keywords + extended_keywords
     dragon = False
+    data_bug = True
 
 
 disk_keywords = [
@@ -66,6 +67,7 @@ class DECB(Dialect):
     keywords = color_keywords + extended_keywords + disk_keywords
     dragon = False
     disk = True
+    data_bug = True
 
 
 super_keywords = [
@@ -84,6 +86,7 @@ class SECB(Dialect):
     keywords = color_keywords + extended_keywords + super_keywords
     dragon = False
     disk = False
+    data_bug = True
 
 
 class SDECB(Dialect):
@@ -91,6 +94,7 @@ class SDECB(Dialect):
     keywords = color_keywords + extended_keywords + super_keywords + disk_keywords
     dragon = False
     disk = True
+    data_bug = True
 
 
 dragon_keywords = [
@@ -130,6 +134,7 @@ class Dragon(Dialect):
     keywords = dragon_keywords
     dragon = True
     disk = False
+    data_bug = True
 
 
 ddos_keywords = [
@@ -150,6 +155,7 @@ class DDOS(Dialect):
     keywords = dragon_keywords + ddos_keywords
     dragon = True
     disk = True
+    data_bug = True
 
 
 DIALECTS = {

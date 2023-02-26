@@ -1,7 +1,7 @@
 import sys
 
 from msbasic.options import Options as BaseOptions
-from msbasic.dialect import Dialect
+from msbasic.dialects import Dialect
 
 basica_keywords = [
     ("'", 0x3A8FD9), ("*", 0xEB), ("+", 0xE9), ("-", 0xEA), ("/", 0xEC),

@@ -1,4 +1,4 @@
-from msbasic.dialect import Dialect
+from msbasic.dialects import Dialect
 
 SPECIALS1 = {
     'DATA': ['DATA'],

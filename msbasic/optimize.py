@@ -10,8 +10,8 @@ class OFlags(Flag):
     I2X = auto()
     Z2P = auto()
     QUOTE = auto()
-    TEXTLEN = auto()
-    FIXDATA = auto()
+    TXTLEN = auto()
+    MOVDAT = auto()
 
 
 class Optimizer:
@@ -153,7 +153,7 @@ class Optimizer:
         self.clean_labs()
         self.no_remarks()
         self.data = reid(self.pp, self.data)
-        self.merge_lines(max_len=max_len, text_len=OFlags.TEXTLEN in flags)
+        self.merge_lines(max_len=max_len, text_len=OFlags.TXTLEN in flags)
         if OFlags.QUOTE in flags:
             self.trim_quote()
         self.data = renumber(self.data, start=0, interval=1)

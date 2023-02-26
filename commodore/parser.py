@@ -27,7 +27,7 @@ class Parser(MSParser):
             self.full_parse = self.kws_txt(data)
         if onepass:
             return self.full_parse
-        return self.get_tokens(fix_data=fix_data)
+        return self.get_tokens(move_data=fix_data)
 
     def deparse_line(self, line: [Token], ws=False) -> str:
         out = super().deparse_line(line, ws=ws)

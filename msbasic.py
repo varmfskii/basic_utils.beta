@@ -58,7 +58,7 @@ def packfn(args: [str]) -> None:
         elif o in ['-X', '--hex']:
             oflags |= OFlags.I2X
         elif o in ['-k', '--token-len']:
-            oflags &= ~OFlags.TEXTLEN
+            oflags &= ~OFlags.TXTLEN
         elif o in ['-m', '--maxline']:
             max_len = int(a)
             if max_len < 0:
@@ -67,7 +67,7 @@ def packfn(args: [str]) -> None:
         elif o in ['-t', '--text']:
             astokens = False
         elif o in ['-x', '--text-len']:
-            oflags |= OFlags.TEXTLEN
+            oflags |= OFlags.TXTLEN
         else:
             assert False, f'unhandled option: [{o}]'
     pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=True)

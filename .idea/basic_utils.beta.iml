@@ -8,13 +8,10 @@
   <component name="PyNamespacePackagesService">
     <option name="namespacePackageFolders">
       <list>
-        <option value="$MODULE_DIR$/applesoft" />
         <option value="$MODULE_DIR$/basic69" />
         <option value="$MODULE_DIR$/commodore" />
         <option value="$MODULE_DIR$/gwbasic" />
-        <option value="$MODULE_DIR$/mbasic80" />
         <option value="$MODULE_DIR$/msbasic" />
-        <option value="$MODULE_DIR$/msx" />
       </list>
     </option>
   </component>

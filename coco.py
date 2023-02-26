@@ -47,7 +47,7 @@ def fixfn(args: [str]) -> None:
 
 def packfn(args: [str]) -> None:
     usage = [
-        "\t-D\t--fix-data\t\tavoid DATA bug\n",
+        "\t-D\t--move-data\t\tMove all data statements to end\n",
         "\t-P\t--point\t\t\tconvert 0 to .\n",
         "\t-X\t--hex\t\t\tconvert integers to &Hhex form\n",
         "\t-k\t--token-len\t\tline length is for tokenized form\n",
@@ -55,14 +55,14 @@ def packfn(args: [str]) -> None:
         "\t-t\t--text\t\t\toutput as text file\n",
         "\t-x\t--text-len\t\tline length is for untokenized form\n"
     ]
-    lopts = ['fix-data', 'token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
+    lopts = ['move-data', 'token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
     astokens = True
     oflags = OFlags(0)
     opts = Options(args, sopts='DPQXkm:tx', lopts=lopts, usage=usage, ext='pack')
     max_len = 0
     for o, a in opts.unused:
-        if o in ['-D', '--fix-data']:
-            oflags |= OFlags.FIXDATA
+        if o in ['-D', '--move-data']:
+            oflags |= OFlags.MOVDAT
         elif o in ['-P', '--point']:
             oflags |= OFlags.Z2P
         elif o in ['-Q', '--quotes']:
@@ -70,7 +70,7 @@ def packfn(args: [str]) -> None:
         elif o in ['-X', '--hex']:
             oflags |= OFlags.I2X
         elif o in ['-k', '--token-len']:
-            oflags &= ~OFlags.TEXTLEN
+            oflags &= ~OFlags.TXTLEN
         elif o in ['-m', '--maxline']:
             max_len = int(a)
             if max_len < 0:
@@ -79,10 +79,10 @@ def packfn(args: [str]) -> None:
         elif o in ['-t', '--text']:
             astokens = False
         elif o in ['-x', '--text-len']:
-            oflags |= OFlags.TEXTLEN
+            oflags |= OFlags.TXTLEN
         else:
             assert False, f'unhandled option: [{o}]'
-    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=OFlags.FIXDATA in oflags)
+    pp = Parser(opts, open(opts.iname, 'rb').read(), fix_data=OFlags.MOVDAT in oflags)
     optimizer = Optimizer(pp)
     optimizer.opt(max_len=max_len, flags=oflags)
     if astokens:

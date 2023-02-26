@@ -15,6 +15,7 @@ class Parser:
         self.kw2code = opts.dialect.kw2code
         self.kw_keys = opts.dialect.kw_keys
         self.specials = opts.dialect.specials
+        self.data_bug = opts.dialect.data_bug
         self.then_kw = self.specials['THEN'] + self.specials['ELSE']
         self.branch_kw = self.specials['GO'] + self.specials['GOTO'] + self.specials['GOSUB']
         self.ign_kw = self.specials['TO'] + self.specials['SUB']
@@ -34,7 +35,7 @@ class Parser:
             self.full_parse = self.kws_txt(data)
         if onepass:
             return self.full_parse
-        return self.get_tokens(fix_data=fix_data)
+        return self.get_tokens(move_data=fix_data)
 
     def kws_bin(self, data: [int]) -> [[Token]]:
         parsed = []
@@ -126,7 +127,7 @@ class Parser:
                 parsed.append(tokens)
         return parsed
 
-    def get_tokens(self, data: [[Token]] or None = None, fix_data=False) -> [[Token]]:
+    def get_tokens(self, data: [[Token]] or None = None, move_data=False) -> [[Token]]:
         if not data:
             data = self.full_parse
         parsed = []
@@ -136,13 +137,13 @@ class Parser:
             for token in line:
                 if token.isnone():
                     new_line += self.parse_none(token.v)
-                elif fix_data and token.isdata():
+                elif move_data and token.isdata():
                     data_data += token.v
                     if len(new_line) >= 2 and new_line[-2].t == ord(':'):
                         new_line = new_line[:-2]
                     else:
                         new_line = new_line[:-1]
-                elif not fix_data or not token.matchkw(self.specials['DATA']):
+                elif (not self.data_bug and not move_data) or not token.matchkw(self.specials['DATA']):
                     new_line.append(token)
             if new_line:
                 label = 0

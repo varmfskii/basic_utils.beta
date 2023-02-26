@@ -1,4 +1,4 @@
-from msbasic.dialect import Dialect
+from msbasic.dialects import Dialect
 
 couleur_keywords = [
     ("'", 0x3A83),

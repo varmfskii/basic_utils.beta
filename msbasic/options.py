@@ -1,7 +1,7 @@
 import getopt
 import sys
 
-from applesoft import Applesoft
+from .dialects import Applesoft
 
 
 class Options:
