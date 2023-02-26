@@ -8,7 +8,7 @@ from msbasic.optimize import Optimizer, OFlags, split_lines
 from msbasic.variables import reid
 
 
-def main(program, args):
+def main(program: str, args: [str]) -> None:
     functions = {
         'd': detokenizefn, 'detokenize': detokenizefn,
         'f': fixfn, 'fix_data': fixfn,
@@ -25,7 +25,7 @@ def main(program, args):
         helpfn(program)
 
 
-def detokenizefn(args):
+def detokenizefn(args: [str]) -> None:
     opts = Options(args, ext='txt')
 
     for o, a in opts.unused:
@@ -35,7 +35,7 @@ def detokenizefn(args):
     open(opts.oname, 'w').write(pp.deparse())
 
 
-def fixfn(args):
+def fixfn(args: [str]) -> None:
     opts = Options(args, ext='txt')
 
     for o, a in opts.unused:
@@ -45,7 +45,7 @@ def fixfn(args):
     open(opts.oname, 'w').write(pp.deparse())
 
 
-def packfn(args):
+def packfn(args: [str]) -> None:
     usage = [
         "\t-P\t--point\t\tconvert 0 to .\n",
         "\t-X\t--hex\t\t\tconvert integers to &Hhex form\n",
@@ -88,7 +88,7 @@ def packfn(args):
         open(opts.oname, 'w').write(pp.deparse(optimizer.data))
 
 
-def reidfn(args):
+def reidfn(args: [str]) -> None:
     astokens = True
     usage = ["\t-t\t--text\t\t\toutput as text file\n"]
     lopts = ["text"]
@@ -106,7 +106,7 @@ def reidfn(args):
         open(opts.oname, 'w').write(pp.deparse(data))
 
 
-def renumberfn(args):
+def renumberfn(args: [str]) -> None:
     astokens = True
     usage = [
         '\t-s<n>\t--start=<num>\t\tstarting line number\n',
@@ -140,7 +140,7 @@ def renumberfn(args):
         open(opts.oname, 'w').write(pp.deparse(data))
 
 
-def tokenizefn(args):
+def tokenizefn(args: [str]) -> None:
     opts = Options(args, ext='tok')
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
@@ -148,7 +148,7 @@ def tokenizefn(args):
     open(opts.oname, 'wb').write(tokenize(pp.full_parse, opts))
 
 
-def unpackfn(args):
+def unpackfn(args: [str]) -> None:
     lo = ["no-whitespace"]
     us = ["\t-n\t--no-whitespace\t\tdo not add extra whitespace\n"]
     opts = Options(args, sopts='n', lopts=lo, usage=us, ext='txt')
@@ -164,7 +164,7 @@ def unpackfn(args):
     open(opts.oname, 'w').write(pp.deparse(data, ws=ws))
 
 
-def helpfn(program):
+def helpfn(program: str) -> None:
     if program:
         fh = sys.stderr
         fh.write(f'Error: Unknown function: {program}\n')

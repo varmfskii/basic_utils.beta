@@ -1,7 +1,7 @@
 import sys
 
 from msbasic.options import Options as BaseOptions
-from msbasic.tokens import tokenize_line
+from msbasic.tokens import tokenize_line, Token
 from .dialects import DIALECTS, DBCSE
 from .parser import Parser
 
@@ -18,7 +18,7 @@ class Options(BaseOptions):
 
     dialect = None
 
-    def subopts(self, other):
+    def subopts(self, other: tuple[str, str]):
         (o, a) = other
         if o in ["-b", "--basic"]:
             if a in DIALECTS.keys():
@@ -51,7 +51,7 @@ class Options(BaseOptions):
                 self.address = 0x25fe
 
 
-def tokenize(data, opts):
+def tokenize(data: [[Token]], opts: Options) -> bytearray:
     # convert a parsed file into tokenized BASIC file
     tokenized = []
     address = opts.address
@@ -60,10 +60,7 @@ def tokenize(data, opts):
         address += 2 + len(line_tokens)
         tokenized += [address // 0x100, address & 0xff] + line_tokens
     tokenized += [0, 0]
-    if opts.disk and opts.isdragon:
-        val = len(tokenized)
-        tokenized = [0x55, 0x01, 0x24, 0x01, val // 256, val & 0xff, 0x8b, 0x8d, 0xaa] + tokenized
-    elif opts.disk:
+    if opts.disk:
         val = len(tokenized)
         tokenized = [0xff, val // 0x100, val & 0xff] + tokenized
     return bytearray(tokenized)

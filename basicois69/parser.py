@@ -2,10 +2,11 @@
 import sys
 
 from msbasic.parser import Parser as MSParser
+from msbasic.tokens import Token
 
 
 class Parser(MSParser):
-    def parse(self, data: [int], fix_data=False, onepass=False) -> [[tuple[int, str] or tuple[int, str, int]]]:
+    def parse(self, data: [int], fix_data=False, onepass=False) -> [[Token]]:
         if data[0] == 0xff:  # decb
             self.full_parse = self.kws_bin(data[3:])
         else:
