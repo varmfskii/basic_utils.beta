@@ -1,19 +1,23 @@
 import getopt
 import sys
 
-from .dialects import Applesoft
+from .dialects import dialects
+
+dialects_g = dialects
 
 
 class Options:
-    sopts = "a:hi:o:"
-    lopts = ['address', "help", "input=", "output="]
+    global dialects_g
+    dialects = dialects_g
+    sopts = "a:b:hi:o:"
+    lopts = ['address', 'basic', "help", "input=", "output="]
     iname: str = None
     oname: str = None
     unused: [tuple[str, str]] = []
     address = 0
-    dialects = {'apple': Applesoft}
     usage = [
-        '\t-a\t--address=<addy>\t\tstarting address\n',
+        '\t-a\t--address=<addy>\tstarting address\n',
+        '\t-b\t--basic=<dialect>\tBASIC dialect\n',
         '\t-h\t--help\t\t\tthis help\n',
         '\t-i<n>\t--input=<file>\t\tinput file\n',
         '\t-o<n>\t--output=<file>\t\toutput file\n',
@@ -47,7 +51,7 @@ class Options:
                 elif a == "help":
                     print("Supported dialects:")
                     for key in self.dialects.keys():
-                        print(f'\t{key}:\t{self.dialects[key].numvar}')
+                        print(f'\t{key}:\t{self.dialects[key].id}')
                     sys.exit(0)
                 else:
                     sys.stderr.write(f'Unsupported dialect: {a}\n')

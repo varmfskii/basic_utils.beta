@@ -9,8 +9,8 @@ class Parser:
     spacer = list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"')
     full_parse = None
 
-    def __init__(self, opts: Options, data: [int] or None = None, be=True, fix_data=False, onepass=False):
-        self.be = be
+    def __init__(self, opts: Options, data: [int] or None = None, fix_data=False, onepass=False):
+        self.be = opts.dialect.be
         self.code2kw = opts.dialect.code2kw
         self.kw2code = opts.dialect.kw2code
         self.kw_keys = opts.dialect.kw_keys

@@ -20,19 +20,7 @@ class Options(BaseOptions):
 
     def subopts(self, other: tuple[str, str]):
         (o, a) = other
-        if o in ["-b", "--basic"]:
-            if a in DIALECTS.keys():
-                self.dialect = DIALECTS[a]()
-            elif a == "help":
-                print("Supported dialects:")
-                for key in DIALECTS.keys():
-                    print(f'\t{key}:\t{DIALECTS[key].numvar}')
-                sys.exit(0)
-            else:
-                sys.stderr.write(f'Unsupported dialect: {a}\n')
-                sys.stderr.write("--basic=help to list available dialects")
-                sys.exit(2)
-        elif o in ["-c", "--cassette"]:
+        if o in ["-c", "--cassette"]:
             self.disk = False
         elif o in ["-d", "--disk"]:
             self.disk = True

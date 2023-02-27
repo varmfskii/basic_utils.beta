@@ -8,7 +8,7 @@ from msbasic.optimize import Optimizer, OFlags, split_lines
 from msbasic.variables import reid
 
 
-def main(program: str, args: [str]) -> None:
+def main():
     functions = {
         'd': detokenizefn, 'detokenize': detokenizefn,
         'f': fixfn, 'fix_data': fixfn,
@@ -19,14 +19,14 @@ def main(program: str, args: [str]) -> None:
         't': tokenizefn, 'tokenize': tokenizefn,
         'u': unpackfn, 'unpack': unpackfn
     }
-    if program in functions.keys():
-        functions[program](args)
+    if sys.argv[1] in functions.keys():
+        functions[sys.argv[1]]()
     else:
-        helpfn(program)
+        helpfn()
 
 
-def detokenizefn(args: [str]) -> None:
-    opts = Options(args, ext='txt')
+def detokenizefn():
+    opts = Options(sys.argv[2:], ext='txt')
 
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
@@ -35,8 +35,8 @@ def detokenizefn(args: [str]) -> None:
     open(opts.oname, 'w').write(pp.deparse())
 
 
-def fixfn(args: [str]) -> None:
-    opts = Options(args, ext='txt')
+def fixfn():
+    opts = Options(sys.argv[2:], ext='txt')
 
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
@@ -45,9 +45,9 @@ def fixfn(args: [str]) -> None:
     open(opts.oname, 'w').write(pp.deparse())
 
 
-def packfn(args: [str]) -> None:
+def packfn():
     usage = [
-        "\t-D\t--move-data\t\tMove all data statements to end\n",
+        "\t-D\t--move-data\t\tmove DATA statements to end\n",
         "\t-P\t--point\t\t\tconvert 0 to .\n",
         "\t-X\t--hex\t\t\tconvert integers to &Hhex form\n",
         "\t-k\t--token-len\t\tline length is for tokenized form\n",
@@ -58,10 +58,10 @@ def packfn(args: [str]) -> None:
     lopts = ['move-data', 'token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
     astokens = True
     oflags = OFlags(0)
-    opts = Options(args, sopts='DPQXkm:tx', lopts=lopts, usage=usage, ext='pack')
+    opts = Options(sys.argv[2:], sopts='DPQXkm:tx', lopts=lopts, usage=usage, ext='pack')
     max_len = 0
     for o, a in opts.unused:
-        if o in ['-D', '--move-data']:
+        if o in ['-D', '--fix-data']:
             oflags |= OFlags.MOVDAT
         elif o in ['-P', '--point']:
             oflags |= OFlags.Z2P
@@ -91,11 +91,11 @@ def packfn(args: [str]) -> None:
         open(opts.oname, 'w').write(pp.deparse(optimizer.data))
 
 
-def reidfn(args: [str]) -> None:
+def reidfn():
     astokens = True
     usage = ["\t-t\t--text\t\t\toutput as text file\n"]
     lopts = ["text"]
-    opts = Options(args, sopts='t', lopts=lopts, usage=usage, ext='reid')
+    opts = Options(sys.argv[2:], sopts='t', lopts=lopts, usage=usage, ext='reid')
     for o, a in opts.unused:
         if o in ['-t', '--text']:
             astokens = False
@@ -109,7 +109,7 @@ def reidfn(args: [str]) -> None:
         open(opts.oname, 'w').write(pp.deparse(data))
 
 
-def renumberfn(args: [str]) -> None:
+def renumberfn():
     astokens = True
     usage = [
         '\t-s<n>\t--start=<num>\t\tstarting line number\n',
@@ -117,7 +117,7 @@ def renumberfn(args: [str]) -> None:
         '\t-v<n>\t--interval=<num>\tinterval between line numbers\n'
     ]
     lopts = ["start=", "interval=", 'text']
-    opts = Options(args, sopts='s:tv:', lopts=lopts, usage=usage, ext='renum')
+    opts = Options(sys.argv[2:], sopts='s:tv:', lopts=lopts, usage=usage, ext='renum')
     start = 10
     interval = 10
     for o, a in opts.unused:
@@ -143,18 +143,18 @@ def renumberfn(args: [str]) -> None:
         open(opts.oname, 'w').write(pp.deparse(data))
 
 
-def tokenizefn(args: [str]) -> None:
-    opts = Options(args, ext='tok')
+def tokenizefn():
+    opts = Options(sys.argv[2:], ext='tok')
     for o, a in opts.unused:
         assert False, f'unhandled option [{o}]'
     pp = Parser(opts, open(opts.iname, 'rb').read(), onepass=True)
     open(opts.oname, 'wb').write(tokenize(pp.full_parse, opts))
 
 
-def unpackfn(args: [str]) -> None:
+def unpackfn():
     lo = ["no-whitespace"]
     us = ["\t-n\t--no-whitespace\t\tdo not add extra whitespace\n"]
-    opts = Options(args, sopts='n', lopts=lo, usage=us, ext='txt')
+    opts = Options(sys.argv[2], sopts='n', lopts=lo, usage=us, ext='txt')
     ws = True
     for o, a in opts.unused:
         if o in ['-n', '--no-whitespace']:
@@ -167,17 +167,21 @@ def unpackfn(args: [str]) -> None:
     open(opts.oname, 'w').write(pp.deparse(data, ws=ws))
 
 
-def helpfn(program: str or None) -> None:
-    if program:
-        fh = sys.stderr
-        fh.write(f'Error: Unknown function: {program}\n')
-    elif program in ['h', 'help']:
+def helpfn():
+    if len(sys.argv) > 1 and sys.argv[1] in ['h', 'help']:
         fh = sys.stdout
+    elif len(sys.argv) > 1:
+        fh = sys.stderr
+        fh.write(f'Error: Unknown function: {sys.argv[1]}\n')
     else:
         fh = sys.stderr
         fh.write(f'Error: No function specified\n')
+
+    opts = Options(sys.argv[2:])
+    usage = opts.usage
+    usage.sort()
+    fh.write(f'Usage: {sys.argv[0]} <function> <options> <infile> [<outfile>]\n')
     fh.write(
-        "Usage: {sys.argv[0]} <function> <options> <infile> [<outfile>]\n"
         "\nFunctions:\n"
         "\thelp\t\tprint this help message\n"
         "\tdetokenize\tconvert to a text file\n"
@@ -187,18 +191,13 @@ def helpfn(program: str or None) -> None:
         "\ttokenize\tconvert to tokenized form\n"
         "\tunpack\t\tsplit lines and insert whitespace\n"
         "\nCommon Options:\n"
-        "\t-a<a>\t--address=<addy>\tStarting memory address\n"
-        "\t-b<d>\t--basic=<dialect\tBASIC dialect\n"
-        "\t-c\t--cassette\t\tCassette file format\n"
-        "\t-d\t--disk\t\t\tDisk file format\n"
-        "\t-h\t--help\t\t\tHelp message\n"
-        "\t-i<n>\t--input=<file>\t\tinput file\n"
-        "\t-o<n>\t--output=<file>\t\toutput file\n"
     )
+    for line in usage:
+        fh.write(line)
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        helpfn(None)
+        helpfn()
     else:
-        main(sys.argv[1], sys.argv[2:])
+        main()

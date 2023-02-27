@@ -10,6 +10,7 @@ class Dialect:
     code2kw: dict[int: str] = {}
     kw_keys: [str] = []
     data_bug = False
+    be = False
 
     def __init__(self):
         for k, c in self.keywords:
@@ -20,6 +21,7 @@ class Dialect:
 
 
 class Applesoft(Dialect):
+    id = 'Applespft BASIC'
     keywords = [
         ("&", 0xAF), ("*", 0xCA), ("+", 0xC8), ("-", 0xC9), ("/", 0xCB),
         (";", 0xCC), ("<", 0xD1), ("=", 0xD0), (">", 0xCF), ("ABS", 0xD4),
@@ -387,3 +389,10 @@ class Crystal(Dialect):
         ("STOP", 0x91), ("STR$", 0xC2), ("TAB(", 0xA1), ("TAN", 0xBE),
         ("THEN", 0xA5), ("TO", 0xA2), ("VAL", 0xC3), ("^", 0xAA)
     ]
+
+
+dialects = {
+    'apple': Applesoft, 'msx': MSX, 'mbasic': MBASIC, 'cc': Compucolor,
+    'exidy': Exidy, 'ibm': GWBASIC, 'l2': TRS80L2, 'l3': TRS80L3, 'nascom': Nascom,
+    'osi': OSI, 'xtal': Crystal
+}

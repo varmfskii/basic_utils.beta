@@ -28,6 +28,7 @@ class CB(Dialect):
     keywords = color_keywords
     dragon = False
     disk = False
+    be = True
 
 
 extended_keywords = [
@@ -49,6 +50,7 @@ class ECB(Dialect):
     keywords = color_keywords + extended_keywords
     dragon = False
     data_bug = True
+    be = True
 
 
 disk_keywords = [
@@ -68,6 +70,7 @@ class DECB(Dialect):
     dragon = False
     disk = True
     data_bug = True
+    be = True
 
 
 super_keywords = [
@@ -87,6 +90,7 @@ class SECB(Dialect):
     dragon = False
     disk = False
     data_bug = True
+    be = True
 
 
 class SDECB(Dialect):
@@ -95,6 +99,7 @@ class SDECB(Dialect):
     dragon = False
     disk = True
     data_bug = True
+    be = True
 
 
 dragon_keywords = [
@@ -135,6 +140,7 @@ class Dragon(Dialect):
     dragon = True
     disk = False
     data_bug = True
+    be = True
 
 
 ddos_keywords = [
@@ -156,6 +162,7 @@ class DDOS(Dialect):
     dragon = True
     disk = True
     data_bug = True
+    be = True
 
 
 DIALECTS = {
