@@ -55,10 +55,20 @@ def packfn():
         "\t-t\t--text\t\t\toutput as text file\n",
         "\t-x\t--text-len\t\tline length is for untokenized form\n"
     ]
-    lopts = ['move-data', 'token-len', 'maxline=', 'text', 'text-len', 'point', 'quotes', 'hex']
+    lopts = [
+        'move-data',
+        'token-len',
+        'maxline=',
+        'text',
+        'text-len',
+        'point',
+        'quotes',
+        'hex'
+    ]
     astokens = True
     oflags = OFlags(0)
-    opts = Options(sys.argv[2:], sopts='DPQXkm:tx', lopts=lopts, usage=usage, ext='pack')
+    opts = Options(sys.argv[2:], sopts='DPQXkm:tx', lopts=lopts,
+                   usage=usage, ext='pack')
     max_len = 0
     for o, a in opts.unused:
         if o in ['-D', '--fix-data']:
@@ -74,7 +84,7 @@ def packfn():
         elif o in ['-m', '--maxline']:
             max_len = int(a)
             if max_len < 0:
-                sys.stderr.write(f'length must be non-negative\n')
+                sys.stderr.write('length must be non-negative\n')
                 sys.exit(2)
         elif o in ['-t', '--text']:
             astokens = False
@@ -175,7 +185,7 @@ def helpfn():
         fh.write(f'Error: Unknown function: {sys.argv[1]}\n')
     else:
         fh = sys.stderr
-        fh.write(f'Error: No function specified\n')
+        fh.write('Error: No function specified\n')
 
     opts = Options(sys.argv[2:])
     usage = opts.usage

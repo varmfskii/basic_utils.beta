@@ -8,7 +8,8 @@ from .petscii import a2p, p2a
 
 
 class Parser(MSParser):
-    def __init__(self, opts: Options, data: [int] or None = None, fix_data=False, onepass=False):
+    def __init__(self, opts: Options, data: [int] or None = None,
+                 fix_data=False, onepass=False):
         super().__init__(opts, data=data, fix_data=fix_data, onepass=onepass)
         self.petscii = opts.petscii
         self.mixed = opts.mixed

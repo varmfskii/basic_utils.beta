@@ -24,7 +24,8 @@ class Options:
     ]
     keywords: [tuple[str, int]]
 
-    def __init__(self, args: [str], sopts='', lopts: [str] = None, usage: [str] = None, ext='bas'):
+    def __init__(self, args: [str], sopts='', lopts: [str] = None,
+                 usage: [str] = None, ext='bas'):
         # parse options for msbasic utils including globally available options
         if not usage:
             usage = []
@@ -38,7 +39,6 @@ class Options:
         try:
             opts, args = getopt.getopt(args, self.sopts, self.lopts)
         except getopt.GetoptError as err:
-            print(err)
             self.show_usage(sys.stderr)
             sys.exit(2)
 

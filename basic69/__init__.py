@@ -31,13 +31,13 @@ class Options(BaseOptions):
     def post(self):
         if self.dialect is None:
             self.dialect = SDECB()
-        if not self.disk:
+        if self.disk is None:
             self.disk = self.dialect.disk
         self.isdragon = self.dialect.dragon
         if self.address == 0x0000:
             if self.dialect.dragon:
                 self.address = 0x2401
-            elif self.disk or (self.disk is None and self.dialect.disk):
+            elif self.disk:
                 self.address = 0x2601
             else:
                 self.address = 0x25fe
@@ -48,7 +48,12 @@ def tokenize(data, opts):
     tokenized = mstokenize(data, opts) + [0, 0]
     if opts.disk and opts.isdragon:
         val = len(tokenized)
-        tokenized = [0x55, 0x01, 0x24, 0x01, val // 256, val & 0xff, 0x8b, 0x8d, 0xaa] + tokenized
+        tokenized = [
+                        0x55, 0x01,
+                        0x24, 0x01,
+                        val // 256, val & 0xff,
+                        0x8b, 0x8d, 0xaa
+                    ] + tokenized
     elif opts.disk:
         val = len(tokenized)
         tokenized = [0xff, val // 0x100, val & 0xff] + tokenized

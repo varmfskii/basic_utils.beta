@@ -26,8 +26,8 @@ def getids(data: [[Token]]) -> dict[TokenType: set]:
             else:
                 pass
 
-    return {TokenType.NUMVAR: numvar, TokenType.STRVAR: strvar, TokenType.NUMARR: numarr,
-            TokenType.STRARR: strarr}
+    return {TokenType.NUMVAR: numvar, TokenType.STRVAR: strvar,
+            TokenType.NUMARR: numarr, TokenType.STRARR: strarr}
 
 
 def nextid(prev: str) -> str:

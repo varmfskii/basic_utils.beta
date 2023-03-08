@@ -92,7 +92,8 @@ class Token:
         return self.t == TokenType.STRARR
 
     def isvar(self):
-        return self.t in [TokenType.NUMARR, TokenType.NUMVAR, TokenType.STRARR, TokenType.STRVAR]
+        return self.t in [TokenType.NUMARR, TokenType.NUMVAR,
+                          TokenType.STRARR, TokenType.STRVAR]
 
     @staticmethod
     def quoted(v: str):
@@ -161,7 +162,8 @@ class Token:
         return f'({self.t}, {self.r}, {self.v})'
 
 
-def tokenize(data: [[tuple[int, str] or tuple[int, str, int]]], opts: Options, be=True) -> [int]:
+def tokenize(data: [[tuple[int, str] or tuple[int, str, int]]],
+             opts: Options, be=True) -> [int]:
     # convert a parsed file into tokenized BASIC file
     address = opts.address
     tokenized = []

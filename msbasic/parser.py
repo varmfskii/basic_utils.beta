@@ -9,7 +9,8 @@ class Parser:
     spacer = list('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"')
     full_parse = None
 
-    def __init__(self, opts: Options, data: [int] or None = None, fix_data=False, onepass=False):
+    def __init__(self, opts: Options, data: [int] or None = None,
+                 fix_data=False, onepass=False):
         self.be = opts.dialect.be
         self.code2kw = opts.dialect.code2kw
         self.kw2code = opts.dialect.kw2code
@@ -17,7 +18,8 @@ class Parser:
         self.specials = opts.dialect.specials
         self.data_bug = opts.dialect.data_bug
         self.then_kw = self.specials['THEN'] + self.specials['ELSE']
-        self.branch_kw = self.specials['GO'] + self.specials['GOTO'] + self.specials['GOSUB']
+        self.branch_kw = ( self.specials['GO'] + self.specials['GOTO']
+                           + self.specials['GOSUB'] )
         self.ign_kw = self.specials['TO'] + self.specials['SUB']
         self.gen = Token(m=opts.dialect.kw2code)
         if data:
@@ -143,21 +145,23 @@ class Parser:
                         new_line = new_line[:-2]
                     else:
                         new_line = new_line[:-1]
-                elif (not self.data_bug and not move_data) or not token.matchkw(self.specials['DATA']):
+                elif (not (self.data_bug or move_data)
+                      or not token.matchkw(self.specials['DATA'])):
                     new_line.append(token)
             if new_line:
                 label = 0
                 for ix, token in enumerate(new_line):
                     # adjust to labels where applicable
-                    if (label and token.isdec()) or (label == 2 and token.isvar()):
+                    if ((label and token.isdec())
+                        or (label == 2 and token.isvar())):
                         new_line[ix] = self.gen.label(token.r)
                     # setup for label detection
                     if token.matchkw(self.then_kw):
                         label = 1
                     elif token.matchkw(self.branch_kw):
                         label = 2
-                    elif label == 1 or (label == 2 and token.t not in [TokenType.NUMVAR, TokenType.DEC, ord(',')]
-                                        and not token.matchkw(self.ign_kw)):
+                    elif (label == 2 and token.t not in [TokenType.NUMVAR, TokenType.DEC, ord(',')]
+                          and not token.matchkw(self.ign_kw)) or label == 1:
                         label = 0
                     else:
                         pass
@@ -174,7 +178,8 @@ class Parser:
         while data != '':
             match = re.match(r'[A-Z][0-9A-Z]*\$\(', data)
             if match:
-                tokens += [Token.strarr(match.group(0)[:-2]), Token.other('$'), Token.other('(')]
+                tokens += [Token.strarr(match.group(0)[:-2]),
+                           Token.other('$'), Token.other('(')]
                 data = data[match.end():]
                 continue
             match = re.match(r'[A-Z][0-9A-Z]*\$', data)
@@ -322,8 +327,10 @@ class Parser:
         else:
             out = ' '
         for ix, token in enumerate(line):
-            if ((token.iskw() and token.r[0].isalpha() and ix > 0 and line[ix - 1].isvar())
-                    or (ws and out[-1] in self.spacer and token.r[0].isalnum())):
+            if ((token.iskw() and token.r[0].isalpha()
+                 and ix > 0 and line[ix - 1].isvar())
+                    or (ws and out[-1] in self.spacer
+                        and token.r[0].isalnum())):
                 out += ' '
             out += token.r
         return out

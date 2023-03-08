@@ -2,7 +2,7 @@ import sys
 
 from msbasic.options import Options as BaseOptions
 from msbasic.tokens import tokenize_line, Token
-from .dialects import DIALECTS, DBCSE
+from .dialects import DBCSE
 from .parser import Parser
 
 
